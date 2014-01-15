@@ -1,0 +1,8 @@
+/node_modules
+/macos
+/doc
+.DS_Store
+p.js
+routes/to_ignore.js
+/public/codemirror.old
+/qtapp
