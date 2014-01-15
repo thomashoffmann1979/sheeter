@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>cell.js</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>cell.js</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              <p>The cell is the smalles unit, with that the user can interact.
+This object represents the datastructe of that cell. That cell
+inherits the functions from the EventEmitter, so it is event-driven.</p>
+<h2 id="events">Events</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p>Every event fires only one argument. That argument is an object with 
+detailed information to that event. At least that object has two properties.
+<em>id</em> is cell-id of the cell, within the current worksheet. <em>worksheet</em> is the worksheet-id, 
+within the current worksheet. If an event is fired up by some calcuations, there can also
+be the <em>triggerID</em>-property. That property will be used to determine circut-calculations.</p>
+<ul>
+<li><strong>changed</strong> fires, if the value of that cell has been changed</li>
+<li><strong>formulaError</strong> fires, if an error occurs in the formula-calculation</li>
+<li><strong>formulaSyntaxError</strong> fires, if the syntax is not valid</li>
+<li><strong>unkownFunction</strong> fires, if there is an unkown function in the formula</li>
+</ul>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">var</span> util = <span class="hljs-built_in">require</span>(<span class="hljs-string">'util'</span>),
+		EventEmitter = <span class="hljs-built_in">require</span>(<span class="hljs-string">'events'</span>).EventEmitter,
+		sheeter_utils= <span class="hljs-built_in">require</span>(<span class="hljs-string">'../utils/utils.js'</span>);
+
+<span class="hljs-keyword">var</span> Cell = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span>{</span>
+	<span class="hljs-keyword">this</span>._cellID;
+	<span class="hljs-keyword">this</span>._value = <span class="hljs-number">0</span>;
+	<span class="hljs-keyword">this</span>._formula;
+	<span class="hljs-keyword">this</span>._worksheet;
+	<span class="hljs-keyword">this</span>._workbook;
+	<span class="hljs-keyword">this</span>._isActive=<span class="hljs-literal">true</span>; <span class="hljs-comment">// default, true</span>
+	<span class="hljs-keyword">this</span>._triggerIndex=<span class="hljs-number">0</span>;
+	<span class="hljs-keyword">this</span>._connected_cells = [];
+	<span class="hljs-keyword">this</span>._referenced_cells = [];
+}
+util.inherits(Cell,EventEmitter);
+
+Cell.prototype = {
+	get id () { <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>._cellID; },
+	set id (i) { 
+		<span class="hljs-keyword">if</span> (sheeter_utils.isCellNotation(i)){
+			
+			<span class="hljs-keyword">this</span>._cellID = i; 
+		}<span class="hljs-keyword">else</span>{
+			<span class="hljs-keyword">throw</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">'There is no valid ID given'</span>);
+		}
+		<span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>; 
+	},
+	
+	get active () { <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>._isActive; },
+	set active (v) { <span class="hljs-keyword">this</span>._isActive = v; <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>; },
+	
+	get value () { <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>._value; },
+	set value (v) { <span class="hljs-keyword">this</span>._value = v; <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>; },
+	
+	get formula () { <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>._formula; },
+	set formula (f) { <span class="hljs-keyword">this</span>._formula = f; <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>; },
+	
+	get table () { <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>._table; },
+	set table (t) { <span class="hljs-keyword">this</span>._table = t; <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>; },
+	
+	get worksheet () { <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>._worksheet; },
+	set worksheet (w) { <span class="hljs-keyword">this</span>._worksheet = w; <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>; },
+	
+	get workbook () { <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>._workbook; },
+	set workbook (w) { <span class="hljs-keyword">this</span>._workbook = w; <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>; }
+	
+}
+
+Cell.prototype.isID = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(id)</span>{</span>
+	<span class="hljs-keyword">var</span> r = <span class="hljs-regexp">/([a-z])([a-z])*([1-9])([0-9])*/i</span>;
+	<span class="hljs-keyword">if</span> (r.test(id)){
+		<span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
+	}<span class="hljs-keyword">else</span>{
+		<span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+	}
+}
+
+Cell.prototype.calculate = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span>{</span>
+	<span class="hljs-keyword">var</span> triggerID,callback,i;
+	<span class="hljs-keyword">for</span>(i=<span class="hljs-number">0</span>;i&lt;<span class="hljs-built_in">arguments</span>.length;i+=<span class="hljs-number">1</span>){
+		<span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> <span class="hljs-built_in">arguments</span>[i]===<span class="hljs-string">'function'</span>){
+			callback=<span class="hljs-built_in">arguments</span>[i];
+		}<span class="hljs-keyword">else</span>{
+			<span class="hljs-keyword">if</span> (i===<span class="hljs-number">0</span>){
+				triggerID=<span class="hljs-built_in">arguments</span>[i];
+			}
+		}
+	}
+	<span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.active){ <span class="hljs-comment">// only calculate if the cell is activated, helpfull on loading sheets</span>
+		<span class="hljs-keyword">if</span>(<span class="hljs-keyword">typeof</span> triggerID === <span class="hljs-string">'undefined'</span>){
+			triggerID = <span class="hljs-keyword">this</span>._cellID+<span class="hljs-string">'.'</span>+(<span class="hljs-keyword">this</span>._triggerIndex++);
+		}
+	}
+}
+exports.Cell = Cell;</pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>
