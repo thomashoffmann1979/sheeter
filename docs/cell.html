@@ -49,37 +49,82 @@ detailed information to that event. At least that object has two properties.
 within the current worksheet. If an event is fired up by some calcuations, there can also
 be the <em>triggerID</em>-property. That property will be used to determine circut-calculations.</p>
 <ul>
-<li><strong>changed</strong> fires, if the value of that cell has been changed</li>
-<li><strong>formulaError</strong> fires, if an error occurs in the formula-calculation</li>
-<li><strong>formulaSyntaxError</strong> fires, if the syntax is not valid</li>
-<li><strong>unkownFunction</strong> fires, if there is an unkown function in the formula</li>
+<li><strong>beforeChange</strong> fires, before the value of the cell will be changed.</li>
+<li><strong>changed</strong> fires, if the value of that cell has been changed.</li>
+<li><strong>formulaError</strong> fires, if an error occurs in the formula-calculation.</li>
+<li><strong>formulaSyntaxError</strong> fires, if the syntax is not valid.</li>
+<li><strong>unkownFunction</strong> fires, if there is an unkown function in the formula.</li>
 </ul>
 
             </div>
             
             <div class="content"><div class='highlight'><pre><span class="hljs-keyword">var</span> util = <span class="hljs-built_in">require</span>(<span class="hljs-string">'util'</span>),
 		EventEmitter = <span class="hljs-built_in">require</span>(<span class="hljs-string">'events'</span>).EventEmitter,
-		sheeter_utils= <span class="hljs-built_in">require</span>(<span class="hljs-string">'../utils/utils.js'</span>);
+		sheeter_utils= <span class="hljs-built_in">require</span>(<span class="hljs-string">'../utils/utils.js'</span>);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <p>The Cell constructer accepts one optional parameter, the configuration object.
+With that configuration you can set:</p>
+<p><strong>Configuration:</strong></p>
+<ul>
+<li><em>value</em> the value for that cell</li>
+<li><em>formula</em> the formula for that cell</li>
+<li><em>worksheet</em> the referenced worksheet</li>
+<li><em>active</em> the state for formula-calculations (defaults to true)</li>
+<li><em>id</em> the id of that cell, within the worksheet</li>
+</ul>
+<p>Keep in mind, the configuration uses the default setter for the configured values.
+So in case of some mistakes, it may happen that some errors are thrown.</p>
 
-<span class="hljs-keyword">var</span> Cell = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span>{</span>
-	<span class="hljs-keyword">this</span>._cellID;
-	<span class="hljs-keyword">this</span>._value = <span class="hljs-number">0</span>;
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">var</span> Cell = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(config)</span>{</span><span class="hljs-comment">//</span>
+	
+	<span class="hljs-keyword">this</span>._id;
+	<span class="hljs-keyword">this</span>._value;
 	<span class="hljs-keyword">this</span>._formula;
 	<span class="hljs-keyword">this</span>._worksheet;
-	<span class="hljs-keyword">this</span>._workbook;
-	<span class="hljs-keyword">this</span>._isActive=<span class="hljs-literal">true</span>; <span class="hljs-comment">// default, true</span>
-	<span class="hljs-keyword">this</span>._triggerIndex=<span class="hljs-number">0</span>;
+	<span class="hljs-keyword">this</span>._isActive=<span class="hljs-literal">true</span>; <span class="hljs-comment">/* default, true */</span>
+	<span class="hljs-keyword">this</span>._triggerIndex=<span class="hljs-number">0</span>; <span class="hljs-comment">/* internal counter, for identifying calculation-circuts*/</span>
 	<span class="hljs-keyword">this</span>._connected_cells = [];
 	<span class="hljs-keyword">this</span>._referenced_cells = [];
+	
+	<span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> config!==<span class="hljs-string">'undefined'</span>){
+		<span class="hljs-comment">/* take care, the configuration order must be keeped
+		 the formula has to be set at the end, because of 
+		 disabling calculations and keeping the value */</span>
+		<span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> config.id!==<span class="hljs-string">'undefined'</span>){
+			<span class="hljs-keyword">this</span>.id = config.id; <span class="hljs-comment">/* using the regular setter function */</span>
+		}
+		<span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> config.worksheet!==<span class="hljs-string">'undefined'</span>){
+			<span class="hljs-keyword">this</span>.worksheet = config.worksheet; <span class="hljs-comment">/* using the regular setter function */</span>
+		}
+		<span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> config.value!==<span class="hljs-string">'undefined'</span>){
+			<span class="hljs-keyword">this</span>.value = config.value; <span class="hljs-comment">/* using the regular setter function */</span>
+		}
+		<span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> config.active!==<span class="hljs-string">'undefined'</span>){
+			<span class="hljs-keyword">this</span>.active = config.active; <span class="hljs-comment">/* using the regular setter function */</span>
+		}
+		<span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> config.formula!==<span class="hljs-string">'undefined'</span>){
+			<span class="hljs-keyword">this</span>.formula = config.formula; <span class="hljs-comment">/* using the regular setter function */</span>
+		}
+	}
 }
 util.inherits(Cell,EventEmitter);
 
 Cell.prototype = {
-	get id () { <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>._cellID; },
+	get id () { <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>._id; },
 	set id (i) { 
 		<span class="hljs-keyword">if</span> (sheeter_utils.isCellNotation(i)){
-			
-			<span class="hljs-keyword">this</span>._cellID = i; 
+			<span class="hljs-keyword">this</span>._id = i; 
 		}<span class="hljs-keyword">else</span>{
 			<span class="hljs-keyword">throw</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">'There is no valid ID given'</span>);
 		}
@@ -95,27 +140,33 @@ Cell.prototype = {
 	get formula () { <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>._formula; },
 	set formula (f) { <span class="hljs-keyword">this</span>._formula = f; <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>; },
 	
-	get table () { <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>._table; },
-	set table (t) { <span class="hljs-keyword">this</span>._table = t; <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>; },
-	
 	get worksheet () { <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>._worksheet; },
 	set worksheet (w) { <span class="hljs-keyword">this</span>._worksheet = w; <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>; },
 	
-	get workbook () { <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>._workbook; },
-	set workbook (w) { <span class="hljs-keyword">this</span>._workbook = w; <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>; }
-	
-}
+}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <p>The <code>calculate([triggerID],[callback])</code> function calculates the formula.
+If the formula-calculation was successfull, the beforeChange will be emitted.
+If no listener on that event returns false, the value will be written to the
+cells value. Only after that the changed-event will be emitted.</p>
+<p>Arguments:</p>
+<ul>
+<li><em>triggerID</em> optional, the id for the circut-detection</li>
+<li><em>callback</em> optional, the callback for the calculation <em>function(err,cell){}</em></li>
+</ul>
 
-Cell.prototype.isID = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(id)</span>{</span>
-	<span class="hljs-keyword">var</span> r = <span class="hljs-regexp">/([a-z])([a-z])*([1-9])([0-9])*/i</span>;
-	<span class="hljs-keyword">if</span> (r.test(id)){
-		<span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
-	}<span class="hljs-keyword">else</span>{
-		<span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
-	}
-}
-
-Cell.prototype.calculate = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span>{</span>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>Cell.prototype.calculate = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span>{</span>
 	<span class="hljs-keyword">var</span> triggerID,callback,i;
 	<span class="hljs-keyword">for</span>(i=<span class="hljs-number">0</span>;i&lt;<span class="hljs-built_in">arguments</span>.length;i+=<span class="hljs-number">1</span>){
 		<span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> <span class="hljs-built_in">arguments</span>[i]===<span class="hljs-string">'function'</span>){
@@ -128,7 +179,7 @@ Cell.prototype.calculate = <span class="hljs-function"><span class="hljs-keyword
 	}
 	<span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.active){ <span class="hljs-comment">// only calculate if the cell is activated, helpfull on loading sheets</span>
 		<span class="hljs-keyword">if</span>(<span class="hljs-keyword">typeof</span> triggerID === <span class="hljs-string">'undefined'</span>){
-			triggerID = <span class="hljs-keyword">this</span>._cellID+<span class="hljs-string">'.'</span>+(<span class="hljs-keyword">this</span>._triggerIndex++);
+			triggerID = <span class="hljs-keyword">this</span>._id+<span class="hljs-string">'.'</span>+(<span class="hljs-keyword">this</span>._triggerIndex++);
 		}
 	}
 }

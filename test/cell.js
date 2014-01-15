@@ -1,13 +1,23 @@
-var Cell = require('../lib/cell/cell.js');
+var Cell = require('../lib/cell/cell.js').Cell;
+
 
 exports.cell = {
-	throwsErrorOnInvalidID: function(test){
+	setID: function(test){
 		var v;
 		test.expect(1);
-		test.throws(function(){
-			var test_cell = new Cell();
-			test_cell.id = '12B3';
+		var test_cell = new Cell();
+		test_cell.id = 'B3';
+		test.ok(test_cell.id==='B3');
+		test.done();
+	},
+	setFormula: function(test){
+		var v;
+		test.expect(1);
+		var test_cell = new Cell({
+			id: 'A1',
+			formula: '=B1'
 		});
+		test.ok(test_cell.formula=='=B1');
 		test.done();
 	}
 }

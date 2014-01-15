@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>formulas.js</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>formulas.js</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              <p>This module contains the forumla parser.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">var</span> keywords = {
+	subtype: {
+		start: <span class="hljs-string">'start'</span>,
+		stop: <span class="hljs-string">'stop'</span>,
+		number: <span class="hljs-string">'number'</span>,
+		text: <span class="hljs-string">'text'</span>,
+		logical: <span class="hljs-string">'logical'</span>,
+		union: <span class="hljs-string">'union'</span>
+	},
+	type: {
+		<span class="hljs-string">'function'</span>: <span class="hljs-string">'function'</span>,
+		subexpression: <span class="hljs-string">'subexpression'</span>,
+		argument: <span class="hljs-string">'argument'</span>,
+		whitespace: <span class="hljs-string">'whitespace'</span>,
+		literal: <span class="hljs-string">'literal'</span>,
+		operand: <span class="hljs-string">'operand'</span>,
+		unkown: <span class="hljs-string">'unkown'</span>
+	}
+}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p>An <code>Token</code> is the smallest part in a formula.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">Token</span><span class="hljs-params">(value, type, subtype)</span> {</span>
+	<span class="hljs-keyword">this</span>.value = value;
+	<span class="hljs-keyword">this</span>.type = type;
+	<span class="hljs-keyword">this</span>.subtype = subtype;
+}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <p>The <code>TokenList</code> contains a collection of Tokens.
+You can add new Tokens, and navigate through them.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">TokenList</span><span class="hljs-params">()</span>{</span>
+	<span class="hljs-keyword">this</span>._items = [];
+	<span class="hljs-keyword">this</span>._cursor = -<span class="hljs-number">1</span>; <span class="hljs-comment">/*the current position in the list*/</span>
+}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <p><code>_bol()</code> checks if we are at the begining of the list.
+This function is only for internal use, and may be changed 
+in the future.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>TokenList.prototype._bol = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span>{</span>
+	<span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>._cursor&lt;=<span class="hljs-number">0</span>) <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
+	<span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <p><code>_eol()</code> checks if we have reached the end of the list.
+This function is only for internal use, and may be changed 
+in the future.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>TokenList.prototype._eol = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span>{</span>
+	<span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>._cursor&gt;<span class="hljs-keyword">this</span>._items.length-<span class="hljs-number">1</span>) <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
+	<span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+              <p><code>_empty()</code> checks if thee list is empty.
+This function is only for internal use, and may be changed 
+in the future.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>TokenList.prototype._empty = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span>{</span>
+	<span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>._items.length===<span class="hljs-number">0</span>;
+}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
+              </div>
+              <p>The <code>moveNext()</code> functions moves the cursor to the next
+position in the list. If the end of the list is reached
+<em>false</em> will be returned, otherwise <em>true</em>.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>TokenList.prototype.moveNext = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span>{</span>
+	<span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>._eol()){
+		<span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>; <span class="hljs-comment">/*the end is reached*/</span>
+	}
+	<span class="hljs-keyword">this</span>._cursor++;
+	<span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
+}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-8">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-8">&#182;</a>
+              </div>
+              <p><code>current()</code> returns the current token at the cursor position.
+If the cursor is out of the range <em>null</em> will be returned.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>TokenList.prototype.current =  <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span>{</span>
+	<span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> <span class="hljs-keyword">this</span>._items[<span class="hljs-keyword">this</span>._cursor]===<span class="hljs-string">'undefined'</span>){
+		<span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;
+	}
+	<span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>._items[<span class="hljs-keyword">this</span>._cursor];
+}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-9">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-9">&#182;</a>
+              </div>
+              <p><code>next()</code> get the next element in the tokenlist or null.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>TokenList.prototype.next = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span>{</span>
+	<span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>._eol()||<span class="hljs-keyword">this</span>._empty()){ <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>; }
+	<span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>._items[<span class="hljs-keyword">this</span>._cursor+<span class="hljs-number">1</span>];
+}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-10">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-10">&#182;</a>
+              </div>
+              <p><code>previous()</code> get the previous element in the tokenlist or null.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>TokenList.prototype.previous = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span>{</span>
+	<span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>._cursor&lt;<span class="hljs-number">1</span>){ <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>; }
+	<span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>._items[<span class="hljs-keyword">this</span>._cursor-<span class="hljs-number">1</span>];
+}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-11">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-11">&#182;</a>
+              </div>
+              <p><code>reset()</code> set the cursor at the first position.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>TokenList.prototype.reset = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span>{</span>
+	<span class="hljs-keyword">if</span>(<span class="hljs-keyword">this</span>._empty()){ <span class="hljs-keyword">throw</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">'Ther are no elements in the TokenList'</span>); }
+	<span class="hljs-keyword">this</span>._cursor = <span class="hljs-number">0</span>;
+}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-12">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-12">&#182;</a>
+              </div>
+              <p><code>add()</code> add an element to the list.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>TokenList.prototype.add = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span>{</span>
+	<span class="hljs-keyword">if</span> (<span class="hljs-built_in">arguments</span>.length&gt;<span class="hljs-number">0</span>){
+		<span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> <span class="hljs-built_in">arguments</span>[<span class="hljs-number">0</span>]===<span class="hljs-string">'object'</span>){
+			<span class="hljs-keyword">this</span>._items.push(<span class="hljs-built_in">arguments</span>[<span class="hljs-number">0</span>]);
+		}<span class="hljs-keyword">else</span>{
+			<span class="hljs-keyword">this</span>._items.push(<span class="hljs-keyword">new</span> Token(<span class="hljs-built_in">arguments</span>[<span class="hljs-number">0</span>],<span class="hljs-built_in">arguments</span>[<span class="hljs-number">1</span>],<span class="hljs-built_in">arguments</span>[<span class="hljs-number">2</span>]));
+		}
+	}
+}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-13">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-13">&#182;</a>
+              </div>
+              <p><code>TokenStack()</code> is an internal object for stacking tokens.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">TokenStack</span><span class="hljs-params">()</span>{</span>
+	<span class="hljs-keyword">this</span>._items = [];
+	
+}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-14">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-14">&#182;</a>
+              </div>
+              <p><code>push(token)</code> pushes an element on the top of the stack.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>TokenStack.prototype.push = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(token)</span>{</span>
+	<span class="hljs-keyword">this</span>._items.push(token);
+}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-15">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-15">&#182;</a>
+              </div>
+              <p><code>pop()</code> read the top element in the stack and removing it.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>TokenStack.prototype.pop = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span>{</span>
+	<span class="hljs-keyword">var</span> token = <span class="hljs-keyword">this</span>._items.pop();
+	<span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> Token(<span class="hljs-string">''</span>,token.type,keywords.subtype.stop);
+}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-16">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-16">&#182;</a>
+              </div>
+              <p><code>last()</code> read the top element in the stack, without removing it.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>TokenStack.prototype.last = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span>{</span>
+	<span class="hljs-keyword">return</span> ((<span class="hljs-keyword">this</span>._items.length &gt; <span class="hljs-number">0</span>) ? <span class="hljs-keyword">this</span>._items[<span class="hljs-keyword">this</span>._items.length - <span class="hljs-number">1</span>] : <span class="hljs-literal">null</span>);
+}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-17">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-17">&#182;</a>
+              </div>
+              <p><code>value()</code> read the value of top element in the stack.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>TokenStack.prototype.value = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span>{</span>
+	<span class="hljs-keyword">return</span> ((<span class="hljs-keyword">this</span>._items.length &gt; <span class="hljs-number">0</span>) ? <span class="hljs-keyword">this</span>._items[<span class="hljs-keyword">this</span>._items.length - <span class="hljs-number">1</span>].value : <span class="hljs-string">''</span>);
+}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-18">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-18">&#182;</a>
+              </div>
+              <p><code>type()</code> read the type of top element in the stack.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>TokenStack.prototype.type = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span>{</span>
+	<span class="hljs-keyword">return</span> ((<span class="hljs-keyword">this</span>._items.length &gt; <span class="hljs-number">0</span>) ? <span class="hljs-keyword">this</span>._items[<span class="hljs-keyword">this</span>._items.length - <span class="hljs-number">1</span>].type : <span class="hljs-string">''</span>);
+}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-19">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-19">&#182;</a>
+              </div>
+              <p><code>subtype()</code> read the type of top element in the stack.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>TokenStack.prototype.subtype = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span>{</span>
+	<span class="hljs-keyword">return</span> ((<span class="hljs-keyword">this</span>._items.length &gt; <span class="hljs-number">0</span>) ? <span class="hljs-keyword">this</span>._items[<span class="hljs-keyword">this</span>._items.length - <span class="hljs-number">1</span>].subtype : <span class="hljs-string">''</span>);
+}
+
+
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">parse</span><span class="hljs-params">(formula)</span>{</span>
+	<span class="hljs-keyword">var</span> token_list = <span class="hljs-keyword">new</span> TokenList();
+	<span class="hljs-keyword">var</span> token_stack = <span class="hljs-keyword">new</span> TokenStack();
+	<span class="hljs-keyword">var</span> token_value = <span class="hljs-string">''</span>;
+	<span class="hljs-keyword">var</span> offset = <span class="hljs-number">0</span>;
+	
+	<span class="hljs-keyword">var</span> in_string = <span class="hljs-literal">false</span>;
+	<span class="hljs-keyword">var</span> in_path = <span class="hljs-literal">false</span>;
+	<span class="hljs-keyword">var</span> in_range = <span class="hljs-literal">false</span>;
+	<span class="hljs-keyword">var</span> in_error = <span class="hljs-literal">false</span>;
+	
+	<span class="hljs-keyword">var</span> currentChar = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> {</span> <span class="hljs-keyword">return</span> formula.substr(offset, <span class="hljs-number">1</span>); };
+	<span class="hljs-keyword">var</span> doubleChar  = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> {</span> <span class="hljs-keyword">return</span> formula.substr(offset, <span class="hljs-number">2</span>); };
+	<span class="hljs-keyword">var</span> nextChar    = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> {</span> <span class="hljs-keyword">return</span> formula.substr(offset + <span class="hljs-number">1</span>, <span class="hljs-number">1</span>); };
+	<span class="hljs-keyword">var</span> EOF         = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> {</span> <span class="hljs-keyword">return</span> (offset &gt;= formula.length); };
+	<span class="hljs-keyword">var</span> unexpected  = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> {</span>
+		<span class="hljs-keyword">if</span> (token_value.length &gt; <span class="hljs-number">0</span>) {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-20">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-20">&#182;</a>
+              </div>
+              <p>not expected</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>			token_list.add(token_value, keywords.type.unkown);
+			token_value = <span class="hljs-string">''</span>;
+		}
+	}
+	
+	<span class="hljs-keyword">var</span> leading_white_space = <span class="hljs-regexp">/(\s)+\=/g</span>;
+	formula = formula.replace(leading_white_space,<span class="hljs-string">''</span>);
+	
+	<span class="hljs-keyword">var</span> regexSN = <span class="hljs-regexp">/^[1-9]{1}(\.[0-9]+)?E{1}$/</span>;
+	<span class="hljs-keyword">var</span> errorRegEx = <span class="hljs-regexp">/#NULL!|#DIV\/0!|#VALUE!|#REF!|#NAME\?|#NUM!|#N\/A/g</span>;
+	<span class="hljs-keyword">var</span> scientific_notation = <span class="hljs-regexp">/\+\-/g</span>;
+	<span class="hljs-keyword">var</span> multi_comparators = <span class="hljs-regexp">/&gt;=|&lt;=|&lt;&gt;/g</span>;
+	<span class="hljs-keyword">var</span> standard_operators = <span class="hljs-regexp">/\+|\-|\*|\/|\^|\&amp;|=|&gt;|&lt;/g</span>;
+	<span class="hljs-keyword">var</span> postfix_operators = <span class="hljs-regexp">/\%/g</span>;
+	<span class="hljs-keyword">while</span> (!EOF()) {
+		<span class="hljs-keyword">if</span> (in_string) {    
+			<span class="hljs-keyword">if</span> (currentChar() == <span class="hljs-string">'"'</span>) {
+				<span class="hljs-keyword">if</span> (nextChar() == <span class="hljs-string">'"'</span>) {
+					token_value += <span class="hljs-string">'"'</span>;
+					offset += <span class="hljs-number">1</span>;
+				} <span class="hljs-keyword">else</span> {
+					in_string = <span class="hljs-literal">false</span>;
+					token_list.add(token_value, keywords.type.literal, keywords.subtype.text);
+					token_value = <span class="hljs-string">''</span>;
+				}      
+			} <span class="hljs-keyword">else</span> {
+				token_value += currentChar();
+			}
+			offset += <span class="hljs-number">1</span>;
+			<span class="hljs-keyword">continue</span>;    
+		}
+		<span class="hljs-keyword">if</span> (in_path) {
+			<span class="hljs-keyword">if</span> (currentChar() == <span class="hljs-string">'\''</span>) {
+				<span class="hljs-keyword">if</span> (nextChar() == <span class="hljs-string">'\''</span>) {
+					token_value += <span class="hljs-string">'\''</span>;
+					offset += <span class="hljs-number">1</span>;
+				} <span class="hljs-keyword">else</span> {
+					in_path = <span class="hljs-literal">false</span>;
+				}      
+			} <span class="hljs-keyword">else</span> {
+				token_value += currentChar();
+			}
+			offset += <span class="hljs-number">1</span>;
+			<span class="hljs-keyword">continue</span>;    
+		}
+		<span class="hljs-keyword">if</span> (in_range) {
+			<span class="hljs-keyword">if</span> (currentChar() == <span class="hljs-string">']'</span>) {
+				in_range = <span class="hljs-literal">false</span>;
+			}
+			token_value += currentChar();
+			offset += <span class="hljs-number">1</span>;
+			<span class="hljs-keyword">continue</span>;
+		}
+		<span class="hljs-keyword">if</span> (in_error) {
+			token_value += currentChar();
+			offset += <span class="hljs-number">1</span>;
+			<span class="hljs-keyword">if</span> (errorRegEx.test(token_value)){
+				in_error=<span class="hljs-literal">false</span>;
+				token_list.add(token_value,keywords.type.literal,keywords.subtype.error);
+				token_value = <span class="hljs-string">''</span>;
+			}
+			<span class="hljs-keyword">continue</span>;
+		}
+		<span class="hljs-comment">/*scientific notation*/</span>
+		<span class="hljs-keyword">if</span> (scientific_notation.test(token_value)){
+			<span class="hljs-keyword">if</span> (token_value.length &gt; <span class="hljs-number">1</span>) {
+				<span class="hljs-keyword">if</span> (token_value.match(regexSN)) {
+					token_value += currentChar();
+					offset += <span class="hljs-number">1</span>;
+					<span class="hljs-keyword">continue</span>;
+				}
+			}
+		}
+		<span class="hljs-comment">/*################*/</span>
+		<span class="hljs-keyword">if</span> (
+			(currentChar() == <span class="hljs-string">'"'</span>) ||
+			(currentChar() == <span class="hljs-string">'\''</span>)
+		) {  
+			unexpected()
+			in_string = <span class="hljs-literal">true</span>;
+			offset += <span class="hljs-number">1</span>;
+			<span class="hljs-keyword">continue</span>;
+		}
+		
+		<span class="hljs-keyword">if</span> (currentChar() == <span class="hljs-string">'['</span>) {
+			in_range = <span class="hljs-literal">true</span>;
+			token_value += currentChar();
+			offset += <span class="hljs-number">1</span>;
+			<span class="hljs-keyword">continue</span>;
+		}
+		
+		<span class="hljs-keyword">if</span> ( currentChar() == <span class="hljs-string">'#'</span>){  
+			unexpected()
+			in_error = <span class="hljs-literal">true</span>;
+			offset += <span class="hljs-number">1</span>;
+			<span class="hljs-keyword">continue</span>;
+		}
+		
+		<span class="hljs-keyword">if</span> (currentChar() == <span class="hljs-string">'{'</span>) {  
+			unexpected()
+			token_stack.push(token_list.add(<span class="hljs-string">'ARRAY'</span>, keywords.type.function, keywords.type.start));
+			token_stack.push(token_list.add(<span class="hljs-string">'ARRAYROW'</span>, keywords.type.function, keywords.type.start));
+			offset += <span class="hljs-number">1</span>;
+			<span class="hljs-keyword">continue</span>;
+		}
+		
+		<span class="hljs-keyword">if</span> (currentChar() == <span class="hljs-string">';'</span>) {  
+			unexpected()
+			token_list.add(token_stack.pop());
+			token_list.add(<span class="hljs-string">','</span>,  keywords.type.argument);
+			token_stack.push(token_list.add(<span class="hljs-string">'ARRAYROW'</span>, keywords.type.function, keywords.type.start));
+			offset += <span class="hljs-number">1</span>;
+			<span class="hljs-keyword">continue</span>;
+		}
+		
+		<span class="hljs-keyword">if</span> (currentChar() == <span class="hljs-string">'}'</span>) {  
+			<span class="hljs-keyword">if</span> (token_value.length &gt; <span class="hljs-number">0</span>) {
+				token_list.add(token_value, keywords.type.literal);
+				token_value = <span class="hljs-string">''</span>;
+			}
+			token_list.add(token_stack.pop());
+			token_list.add(token_stack.pop());
+			offset += <span class="hljs-number">1</span>;
+			<span class="hljs-keyword">continue</span>;
+		}
+		
+		<span class="hljs-keyword">if</span> (currentChar() == <span class="hljs-string">' '</span>) {
+			<span class="hljs-keyword">if</span> (token_value.length &gt; <span class="hljs-number">0</span>) {
+				token_list.add(token_value, keywords.type.literal);
+				token_value = <span class="hljs-string">''</span>;
+			}
+			token_list.add(<span class="hljs-string">''</span>, keywords.type.whitespace);
+			offset += <span class="hljs-number">1</span>;
+			<span class="hljs-keyword">while</span> ((currentChar() == <span class="hljs-string">' '</span>) &amp;&amp; (!EOF())) { 
+				offset += <span class="hljs-number">1</span>; 
+			}
+			<span class="hljs-keyword">continue</span>;     
+		}
+		<span class="hljs-keyword">if</span> (multi_comparators.test( doubleChar() )){
+			<span class="hljs-keyword">if</span> (token_value.length &gt; <span class="hljs-number">0</span>) {
+				token_list.add(token_value, keywords.type.literal);
+				token_value = <span class="hljs-string">''</span>;
+			}
+			token_list.add(doubleChar(), keywords.type.operand, keywords.subtype.logical);
+			offset += <span class="hljs-number">2</span>;
+			<span class="hljs-keyword">continue</span>;     
+		}
+		
+		<span class="hljs-keyword">if</span> (standard_operators.test( currentChar() )){
+			<span class="hljs-keyword">if</span> (token_value.length &gt; <span class="hljs-number">0</span>) {
+				token_list.add(token_value, keywords.type.literal);
+				token_value = <span class="hljs-string">''</span>;
+			}
+			token_list.add(currentChar(), keywords.type.operand);
+			offset += <span class="hljs-number">1</span>;
+			<span class="hljs-keyword">continue</span>;     
+		}
+		
+		<span class="hljs-keyword">if</span> (postfix_operators.test( currentChar() )){
+			<span class="hljs-keyword">if</span> (token_value.length &gt; <span class="hljs-number">0</span>) {
+				token_list.add(token_value, keywords.type.literal);
+				token_value = <span class="hljs-string">''</span>;
+			}
+			token_list.add(currentChar(), keywords.type.operand);
+			offset += <span class="hljs-number">1</span>;
+			<span class="hljs-keyword">continue</span>;     
+		}
+		
+		<span class="hljs-keyword">if</span> (currentChar() == <span class="hljs-string">'('</span>) {
+			<span class="hljs-keyword">if</span> (token_value.length &gt; <span class="hljs-number">0</span>) {
+				token_stack.push(token_list.add(token_value, keywords.type.function, keywords.subtype.start));
+				token_value = <span class="hljs-string">''</span>;
+			} <span class="hljs-keyword">else</span> {
+				token_stack.push(token_list.add(<span class="hljs-string">""</span>, keywords.type.subexpression, keywords.subtype.start));
+			}
+			offset += <span class="hljs-number">1</span>;
+			<span class="hljs-keyword">continue</span>;
+		}
+		
+		<span class="hljs-keyword">if</span> (currentChar() == <span class="hljs-string">','</span>) {
+			<span class="hljs-keyword">if</span> (token_value.length &gt; <span class="hljs-number">0</span>) {
+				token_list.add(token_value,  keywords.type.literal);
+				token_value = <span class="hljs-string">''</span>;
+			}
+			<span class="hljs-keyword">if</span> (!(token_stack.type() ==  keywords.type.function)) {
+				token_list.add(currentChar(),  keywords.type.operand,  keywords.subtype.union);
+			} <span class="hljs-keyword">else</span> {
+				token_list.add(currentChar(),  keywords.type.argument);
+			}
+			offset += <span class="hljs-number">1</span>;
+			<span class="hljs-keyword">continue</span>;
+		}
+		
+		<span class="hljs-keyword">if</span> (currentChar() == <span class="hljs-string">')'</span>) {
+			<span class="hljs-keyword">if</span> (token_value.length &gt; <span class="hljs-number">0</span>) {
+				token_list.add(token_value, keywords.type.operand);
+				token_value = <span class="hljs-string">''</span>;
+			}
+			token_list.add(token_stack.pop());
+			offset += <span class="hljs-number">1</span>;
+			<span class="hljs-keyword">continue</span>;
+		}
+		token_value += currentChar();
+		offset += <span class="hljs-number">1</span>;
+	} <span class="hljs-comment">/*while EOF*/</span>
+}
+
+exports.parse = parse;</pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>
