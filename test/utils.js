@@ -1,6 +1,6 @@
 var utils = require('../lib/utils/utils.js');
 
-exports.cell = {
+exports.utils = {
 	isCellNotation: function(test){
 		var v;
 		test.expect(2);
@@ -44,6 +44,13 @@ exports.cell = {
 			columnIndex: 53,
 			row: 1
 		});
+		test.done();
+	},
+	columnStringFromIndex: function(test){
+		var v;
+		test.expect(1);
+		v = utils.columnStringFromIndex(53);
+		test.equals(v,'BA');
 		test.done();
 	}
 }

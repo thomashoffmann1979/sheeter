@@ -46,12 +46,15 @@
             </div>
             
             <div class="content"><div class='highlight'><pre>exports.columnIndexFromString = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(str)</span>{</span>
-	<span class="hljs-keyword">var</span> index,i,m;
+	<span class="hljs-keyword">var</span> index,i,m,c,e;
 	str = str.toUpperCase();
-	str = str.replace(<span class="hljs-regexp">/[0-9]/</span>,<span class="hljs-string">''</span>);
+	str = str.replace(<span class="hljs-regexp">/[^A-Z]/g</span>,<span class="hljs-string">''</span>);
 	index = <span class="hljs-number">0</span>;
-	<span class="hljs-keyword">for</span>(i=<span class="hljs-number">0</span>,m=str.length;i&lt;m;i+=<span class="hljs-number">1</span>){
-		index += str.charCodeAt(i) - <span class="hljs-number">64</span>;
+	m = str.length;
+	<span class="hljs-keyword">for</span>(i=m;i&gt;<span class="hljs-number">0</span>;i-=<span class="hljs-number">1</span>){
+		c=str.charCodeAt(i-<span class="hljs-number">1</span>) - <span class="hljs-number">64</span>;
+		e=m-i;
+		index +=c*(<span class="hljs-built_in">Math</span>.pow(<span class="hljs-number">26</span>,e));
 	}
 	<span class="hljs-keyword">return</span> index;
 }</pre></div></div>
@@ -64,6 +67,37 @@
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <p>The <code>columnStringFromIndex</code> function return the column string for the given index.</p>
+<p>Arguments:</p>
+<ul>
+<li><em>index</em> the index for the column, must be greater than 0.</li>
+</ul>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>exports.columnStringFromIndex =  <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(index)</span>{</span>
+	<span class="hljs-keyword">var</span> cl,m,i,result;
+	<span class="hljs-keyword">if</span> (index&lt;<span class="hljs-number">1</span>){
+		<span class="hljs-keyword">throw</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">'invalid index'</span>);
+	}
+	cl = index.toString(<span class="hljs-number">26</span>);
+	m=cl.length;
+	result=<span class="hljs-string">''</span>;
+	<span class="hljs-keyword">for</span>(i=<span class="hljs-number">0</span>;i&lt;m;i+=<span class="hljs-number">1</span>){
+		result+= <span class="hljs-built_in">String</span>.fromCharCode(<span class="hljs-built_in">parseInt</span>(cl.charAt(i))+<span class="hljs-number">64</span>);
+	}
+	<span class="hljs-keyword">return</span> result;
+}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
               </div>
               <p>The <code>getColumnAndRow</code> function extracts the column and row.</p>
 <p>Arguments:</p>
@@ -83,9 +117,8 @@ rownumber <em>row</em>.</p>
 		<span class="hljs-keyword">throw</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">'not a valid cell notation'</span>);
 	}
 	cell = cell.toUpperCase();
-	column = cell.replace(<span class="hljs-regexp">/[0-9]/</span>,<span class="hljs-string">''</span>);
-	
-	row = <span class="hljs-number">1</span>*cell.replace(<span class="hljs-regexp">/[A-Z]/</span>,<span class="hljs-string">''</span>);
+	column = cell.replace(<span class="hljs-regexp">/[^A-Z]/g</span>,<span class="hljs-string">''</span>);
+	row = <span class="hljs-number">1</span>*cell.replace(<span class="hljs-regexp">/[^0-9]/g</span>,<span class="hljs-string">''</span>);
 	
 	<span class="hljs-keyword">return</span> {
 		column: column,
@@ -97,11 +130,11 @@ rownumber <em>row</em>.</p>
         </li>
         
         
-        <li id="section-4">
+        <li id="section-5">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-4">&#182;</a>
+                <a class="pilcrow" href="#section-5">&#182;</a>
               </div>
               <p>The <code>isCellNotation</code> function checks a given string, 
 if it is a valid cell notation (eg. &quot;B1&quot;).</p>
@@ -131,11 +164,11 @@ cell string. Otherwise <em>false</em>.</p>
         </li>
         
         
-        <li id="section-5">
+        <li id="section-6">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-5">&#182;</a>
+                <a class="pilcrow" href="#section-6">&#182;</a>
               </div>
               <p>The <code>isRangeNotaion</code> function checks a given string, 
 if it is a valid range notation (eg. &quot;A1:A321&quot;).</p>
@@ -149,9 +182,16 @@ range string. Otherwise <em>false</em>.</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>exports.isRangeNotaion = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(rangeString)</span>{</span>
-	<span class="hljs-keyword">var</span> parts = rangeString.split(<span class="hljs-string">':'</span>);
+	<span class="hljs-keyword">var</span> parts,cell1,cell2;
+			
+	parts= rangeString.split(<span class="hljs-string">':'</span>);
 	<span class="hljs-keyword">if</span> (parts.length===<span class="hljs-number">2</span>){
-		<span class="hljs-keyword">if</span> ( exports.isCellID(parts[<span class="hljs-number">0</span>]) &amp;&amp; exports.isCellID(parts[<span class="hljs-number">1</span>]) ){
+		cell1=exports.getColumnAndRow(parts[<span class="hljs-number">0</span>]);
+		cell2=exports.getColumnAndRow(parts[<span class="hljs-number">1</span>]);
+		<span class="hljs-keyword">if</span> ( (cell1.row===cell2.row) &amp;&amp; (cell1.column!==cell2.column) ||
+				(cell1.row!==cell2.row) &amp;&amp; (cell1.column===cell2.column) ||
+				(cell1.row===cell2.row) &amp;&amp; (cell1.column===cell2.column)
+			 ){
 			<span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
 		}
 	}
