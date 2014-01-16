@@ -32,9 +32,10 @@ exports.workbook = {
 		sheet.getCell('A4').value=5;
 		sheet.getCell('A5').value=6;
 		sheet.getCell('A6').value=1;
+		sheet.getCell('A7').value=0;
 		sheet.getCell('B1').formula = '=IF(1=2;3;4)';
 		sheet.getCell('B2').formula = '=IF(1=2;3)';
-		sheet.getCell('B3').formula = '=IF(1=A1;0;-1)';
+		sheet.getCell('B3').formula = '=IF(1=A1;A7;-1)';
 		test.ok(sheet.getCell('B1').value == 4);
 		test.ok(sheet.getCell('B2').value === '');
 		test.ok(sheet.getCell('B3').value == 0);
