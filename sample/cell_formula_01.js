@@ -2,9 +2,11 @@ var Cell = require('../lib/cell/cell').Cell;
 var formulas = require('../lib/formulas/formulas');
 var Worksheet = require('../lib/worksheet/worksheet').Worksheet;
 
-var v = formulas.parse('=IF(A1<B2;1;2)');
+//var v = formulas.parse('= 1+2*3 ');
+
+var v = formulas.parse('=IF(A1=B2;1;2) + -1 * (B2+SUM(A2:D2)) ');
 //var v = formulas.parse('= A1 - B2+SUM( A2:D2 ) + 18 + A1*B2 + A4+(A5*A3) + IF(A1<>B2;1;2)');
-console.log(v);
+//console.log(v);
 formulas.execute(v);
 // Testing a really simple formula
 /*
