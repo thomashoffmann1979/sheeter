@@ -10,16 +10,16 @@ exports.utils = {
 		test.ok(!v);
 		test.done();
 	},
-	isRangeNotaion: function(test){
+	isRangeNotation: function(test){
 		var v;
 		test.expect(4);
-		v = utils.isRangeNotaion('BA12:BA1');
+		v = utils.isRangeNotation('BA12:BA1');
 		test.ok(v,"same column, differnt rows");
-		v = utils.isRangeNotaion('A1:Z1');
+		v = utils.isRangeNotation('A1:Z1');
 		test.ok(v,"same row, different column");
-		v = utils.isRangeNotaion('A1:A1');
+		v = utils.isRangeNotation('A1:A1');
 		test.ok(v,"same row, same column");
-		v = utils.isRangeNotaion('BY12:BZ1');
+		v = utils.isRangeNotation('BY12:BZ1');
 		test.ok(!v,"different columns and rows (matrix) should fail");
 		test.done();
 	},
