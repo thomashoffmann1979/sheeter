@@ -42,8 +42,8 @@ var expected_calculation_results = {
 	'=1+(2*3)': 7,
 	'=1+2*3': 7,
 	'=1+-2*-3': 7,
-	'=1+A1': '#VALUE!', //should not work, because no cell are available
-	'=SUM(A1:A3)': '#VALUE!'
+	'=1+A1': '#REF!', //should not work, because no cell are available
+	'=SUM(A1:A3)': '#REF!'
 }
 		
 
