@@ -37,6 +37,16 @@ var expected_parser_results = {
 	]
 };
 
+var expected_calculation_results = {
+	'=1': 1,
+	'=1+(2*3)': 7,
+	'=1+2*3': 7,
+	'=1+-2*-3': 7,
+	'=1+A1': '#VALUE!', //should not work, because no cell are available
+	'=SUM(A1:A3)': '#VALUE!'
+}
+		
+
 module.exports.parser ={
 	"parsing formulas": function(test) {
 		var v;
@@ -44,6 +54,16 @@ module.exports.parser ={
 		for(var i in expected_parser_results){
 			 v = formulas.parse(i);
 			test.deepEqual(expected_parser_results[i],v._items,i);
+		}
+		test.done();
+	},
+	"checking calculations": function(test){
+		var v,p;
+		test.expect(expected_calculation_results.length);
+		for(var i in expected_calculation_results){
+			p = formulas.parse(i);
+			v = formulas.execute({},p);
+			test.equals(expected_calculation_results[i],v,i);
 		}
 		test.done();
 	}
