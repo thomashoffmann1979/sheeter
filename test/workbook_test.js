@@ -23,7 +23,7 @@ exports.workbook = {
 	},
 	if_function: function(test){
 		var v;
-		test.expect(2);
+		test.expect(3);
 		var workbook = new Workbook();
 		var sheet = workbook.createWorkSheet();
 		sheet.getCell('A1').value=1;
@@ -34,8 +34,10 @@ exports.workbook = {
 		sheet.getCell('A6').value=1;
 		sheet.getCell('B1').formula = '=IF(1=2;3;4)';
 		sheet.getCell('B2').formula = '=IF(1=2;3)';
+		sheet.getCell('B3').formula = '=IF(1=A1;0;-1)';
 		test.ok(sheet.getCell('B1').value == 4);
 		test.ok(sheet.getCell('B2').value === '');
+		test.ok(sheet.getCell('B3').value == 0);
 		test.done();
 	},
 }
