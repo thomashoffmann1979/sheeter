@@ -10,7 +10,7 @@ sheet.getCell('A3',{value: 5});
 sheet.getCell('A4',{value: 5});
 sheet.getCell('A5',{value: 5});
 
-var cell = sheet.getCell('A6',{formula:'=IF(1<>2;1;2)'});
+var cell = sheet.getCell('A6',{formula:'=IF(1=2;1;2)'});
 //cell.formula = '=IF(1<>2;1;2)';
 
 //console.log(sheet.getCell('A6').worksheet);
