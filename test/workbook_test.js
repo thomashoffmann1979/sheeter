@@ -23,7 +23,7 @@ exports.workbook = {
 	},
 	if_function: function(test){
 		var v;
-		test.expect(4);
+		test.expect(5);
 		var workbook = new Workbook();
 		var sheet = workbook.createWorkSheet();
 		sheet.getCell('A1').value=1;
@@ -37,10 +37,12 @@ exports.workbook = {
 		sheet.getCell('B2').formula = '=IF(1=2;3)';
 		sheet.getCell('B3').formula = '=IF(1=A1;A7;-1)';
 		sheet.getCell('B4').formula = '=SUM(A1:A3)';
+		sheet.getCell('B5').formula = '=AVG(A1:A3)';
 		test.ok(sheet.getCell('B1').value == 4);
 		test.ok(sheet.getCell('B2').value === '');
 		test.ok(sheet.getCell('B3').value == 0);
 		test.ok(sheet.getCell('B4').value == 2);
+		test.ok(sheet.getCell('B5').value == 2/3);
 		test.done();
 	},
 }
