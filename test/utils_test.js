@@ -1,26 +1,69 @@
 var utils = require('../lib/utils/utils.js');
 
+var isCellNotation_Queries = [
+	{
+		test: 'A1',
+		result: true
+	},
+	{
+		test: 'BY23',
+		result: true
+	},
+	{
+		test: 'BY023',
+		result: false
+	},
+	{
+		test: '[Table 1]!BY23',
+		result: true
+	},
+	{
+		test: '[Table 1]![Table 2]!BY23',
+		result: false
+	}
+];
+
+
+var isRangeNotation_Queries = [
+	{
+		test: 'BA12:BA1',
+		result: true
+	},
+	{
+		test: 'A1:Z1',
+		result: true
+	},
+	{
+		test: 'A1:A1',
+		result: true
+	},
+	{
+		test: 'BY12:BZ1',
+		result: false
+	},
+	{
+		test: '[Table 1]!A1:A1',
+		result: true
+	}
+];
+
 exports.utils = {
 	isCellNotation: function(test){
-		var v;
-		test.expect(2);
-		v = utils.isCellNotation('BY23');
-		test.ok(v);
-		v = utils.isCellNotation('BY012');
-		test.ok(!v);
+		var v,i,m;
+		test.expect(isCellNotation_Queries.length);
+		for(i=0,m=isCellNotation_Queries.length; i< m; i+=1){
+			v = utils.isCellNotation(isCellNotation_Queries[i].test);
+			test.ok(isCellNotation_Queries[i].result === v,'testing: '+isCellNotation_Queries[i].test);
+		}
 		test.done();
 	},
 	isRangeNotation: function(test){
 		var v;
-		test.expect(4);
-		v = utils.isRangeNotation('BA12:BA1');
-		test.ok(v,"same column, differnt rows");
-		v = utils.isRangeNotation('A1:Z1');
-		test.ok(v,"same row, different column");
-		v = utils.isRangeNotation('A1:A1');
-		test.ok(v,"same row, same column");
-		v = utils.isRangeNotation('BY12:BZ1');
-		test.ok(!v,"different columns and rows (matrix) should fail");
+		test.expect(isRangeNotation_Queries.length);
+		for(i=0,m=isRangeNotation_Queries.length; i< m; i+=1){
+			v = utils.isRangeNotation(isRangeNotation_Queries[i].test);
+			test.ok(isRangeNotation_Queries[i].result === v,'testing: '+isRangeNotation_Queries[i].test);
+		}
 		test.done();
 	},
 	getColumnAndRow: function(test){
