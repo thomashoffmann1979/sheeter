@@ -9,6 +9,6 @@ reader = new XLSXReader({
 
 reader.open({},function(err){
     if (err) throw err;
-    console.log('done');
+    //console.log('done');
 });
 
