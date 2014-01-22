@@ -1,1 +1,16 @@
-// Sample Text
+#!/usr/bin/env node
+
+var fs = require('fs');
+var program = require('commander');
+var pjson = require('../package.json');
+
+program
+    .version(pjson.version)
+    .description('Spreadsheet in your console')
+
+    .option('show <file>', 'showing the content of the given spreadsheet file')
+    .parse(process.argv);
+
+if (program.show){
+    console.log(program.show);
+}
