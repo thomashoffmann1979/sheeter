@@ -10,7 +10,7 @@ Installation
 Note: This is a really early state of code, so you can have a look inside. But please
 don't use it in any program, at this time!
     
-    [sudo] npm install https://github.com/thomashoffmann1979/sheeter.git -g
+    [sudo] npm install git+https://github.com/thomashoffmann1979/sheeter.git -g
 
 Usage
 =====
