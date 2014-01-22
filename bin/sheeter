@@ -8,9 +8,53 @@ program
     .version(pjson.version)
     .description('Spreadsheet in your console')
 
-    .option('show <file>', 'showing the content of the given spreadsheet file')
+    .option('-s, --show <file>..<table>', 'showing the content of the given spreadsheet file [and table, if more than one table is inside]')
     .parse(process.argv);
 
 if (program.show){
-    console.log(program.show);
+    
+    var XLSXReader = require('../lib/reader/xlsxreader').XLSXReader,
+        path =  require('path'),
+        reader,
+        Workbook = require('../lib/workbook/workbook').Workbook;
+
+
+    reader = new XLSXReader({
+        filename: path.join(program.show[0]),
+        workbook: new Workbook()
+    });
+
+    reader.on('mainReady', function(){
+        var list = reader.workbook.getWorkSheetList(),
+            i,
+            m,
+            r;
+
+        for(i in list){
+            m = list[i].getMatrixByRow({nice:true,header:true,rows:true});
+            if ((list.length !== 1) && (list[i].title!=program.show[1])){
+
+                if (typeof program.show[1] == 'undefined'){
+                    console.log(list[i].title);
+                }
+
+            }else{
+                console.log(list[i].title+':');
+
+                for( r in m ){
+                    console.log('|'+m[r].join('|')+'|');
+                    if ( i == 0){
+
+                    }
+                }
+
+            }
+        }
+
+    });
+
+    reader.open({},function(err){
+        if (err) throw err;
+        //console.log('done');
+    });
 }
