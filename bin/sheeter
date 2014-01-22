@@ -5,14 +5,18 @@ var fs = require('fs'),
     pjson = require('../package.json'),
     XLSXReader = require('../lib/reader/xlsxreader').XLSXReader,
     path =  require('path'),
-    reader,
-    Workbook = require('../lib/workbook/workbook').Workbook;
+    sheeter,
+    Sheeter = require('../lib/main').Sheeter;
 
 program
     .version(pjson.version)
     .description('Spreadsheet in your console')
 
-    .option('-s, --show <file>..<table>', 'showing the content of the given spreadsheet file [and table, if more than one table is inside]')
+    .option('-s, --show <file> [<sheet>]', [
+        'Showing the content of the given spreadsheet file.',
+        'If more than one Sheet is inside and no sheet is specified,',
+        'The list of all sheets will be shown'
+    ].join(' '))
     .option('-e, --edit <file>..<table>', 'edit the content of the given spreadsheet file [and table, if more than one table is inside]')
     .parse(process.argv);
 
@@ -20,48 +24,14 @@ if (program.show){
     
 
     try{
-        reader = new XLSXReader({
-            filename: path.join(program.show[0]),
-            workbook: new Workbook()
+        sheeter = new Sheeter();
+        sheeter.on('opened',function(wb){
+            var list = wb.getWorkSheetList();
+            wb.output({
+                sheet: program.show[1]
+            });
         });
-
-        reader.on('mainReady', function(){
-            var list = reader.workbook.getWorkSheetList(),
-                i,
-                m,
-                r,
-                line;
-
-            for(i in list){
-                m = list[i].getMatrixByRow({nice:true,header:true,rows:true});
-                if ((list.length !== 1) && (list[i].title!=program.show[1])){
-
-                    if (typeof program.show[1] == 'undefined'){
-                        console.log(list[i].title);
-                    }
-
-                }else{
-                    console.log(list[i].title+':');
-                    for( r in m ){
-                        line = '|'+m[r].join('|')+'|';
-                        if (( r == 0 )){
-                            console.log(line.replace(/./gi, '_'));
-                        }
-                        console.log('|'+m[r].join('|')+'|');
-                        if (( r == 0 )|| ( r == m.length-1 )){
-                            console.log(line.replace(/./gi, '_'));
-                        }
-                    }
-
-                }
-            }
-
-        });
-
-        reader.open({},function(err){
-            if (err) throw err;
-            //console.log('done');
-        });
+        sheeter.open(program.show[0]);
     }catch(err){
         console.log(err)
     }
