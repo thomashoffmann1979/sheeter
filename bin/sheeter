@@ -11,13 +11,13 @@ var fs = require('fs'),
 program
     .version(pjson.version)
     .description('Spreadsheet in your console')
-
+    .option('-i, --inactive', 'Don\'t calculate any formulas')
     .option('-s, --show <file> [<sheet>]', [
         'Showing the content of the given spreadsheet file.',
         'If more than one Sheet is inside and no sheet is specified,',
         'The list of all sheets will be shown'
     ].join(' '))
-    .option('-e, --edit <file>..<table>', 'edit the content of the given spreadsheet file [and table, if more than one table is inside]')
+    //.option('-e, --edit <file>..<table>', 'edit the content of the given spreadsheet file [and table, if more than one table is inside]')
     .parse(process.argv);
 
 if (program.show){
@@ -31,7 +31,7 @@ if (program.show){
                 sheet: program.show[1]
             });
         });
-        sheeter.open(program.show[0]);
+        sheeter.open(program.show[0],(typeof program.inactive=='undefined'));
     }catch(err){
         console.log(err)
     }
