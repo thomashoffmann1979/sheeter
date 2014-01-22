@@ -13,6 +13,7 @@ program
     .description('Spreadsheet in your console')
 
     .option('-s, --show <file>..<table>', 'showing the content of the given spreadsheet file [and table, if more than one table is inside]')
+    .option('-e, --edit <file>..<table>', 'edit the content of the given spreadsheet file [and table, if more than one table is inside]')
     .parse(process.argv);
 
 if (program.show){
