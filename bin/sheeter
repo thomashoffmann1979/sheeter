@@ -15,7 +15,7 @@ program
     .option('-s, --show <file> [<sheet>]', [
         'Showing the content of the given spreadsheet file.',
         'If more than one Sheet is inside and no sheet is specified,',
-        'The list of all sheets will be shown'
+        'the list of all sheets will be shown.'
     ].join(' '))
     //.option('-e, --edit <file>..<table>', 'edit the content of the given spreadsheet file [and table, if more than one table is inside]')
     .parse(process.argv);
@@ -35,4 +35,6 @@ if (program.show){
     }catch(err){
         console.log(err)
     }
+}else{
+    program.help()
 }
