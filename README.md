@@ -14,12 +14,18 @@ don't use it in any program, at this time!
 
 Usage
 =====
-    
-    sheeter show <myfile>
-    
-or
 
-    sheeter show <myfile> <mytable>
+Displaying the content or list the sheets inside (if more than one sheet is inside).
+    
+    sheeter <myfile>
+    
+Displaying the content of <mysheet>.
+
+    sheeter <myfile> <mysheet>
+
+Showing all arguments.
+
+    sheeter -h
 
 Requirements
 ============
