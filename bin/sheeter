@@ -8,6 +8,7 @@ var fs = require('fs'),
     sheeter,
     filename,
     sheetname,
+    startTime,
     Sheeter = require('../lib/main').Sheeter;
 
 var exdendedHelp = function(){
@@ -34,13 +35,15 @@ program
     .usage('[options] <file> [sheet]')
     .option('-i, --inactive', 'Don\'t calculate any formulas')
     .option('-f, --full', 'Display the full column width.')
+    .option('-t, --time', 'Display the elapsed time.')
     .on('--help', exdendedHelp)
     .parse(process.argv);
 
 if ( (program.args.length >0 ) && (program.args.length < 3) ){
     
-
-    try{
+    startTime = (new Date()).getTime();
+    
+//    try{
         sheeter = new Sheeter();
         sheeter.on('opened',function(wb){
             var list = wb.getWorkSheetList();
@@ -48,11 +51,15 @@ if ( (program.args.length >0 ) && (program.args.length < 3) ){
                 sheet: program.args[1],
                 full: program.full
             });
+            
+            if (program.time){
+                console.log( ((new Date()).getTime()-startTime)/1000,'ms');
+            }
         });
         sheeter.open(program.args[0],(typeof program.inactive=='undefined'));
-    }catch(err){
-        console.log(err)
-    }
+//    }catch(err){
+//        console.log('sheeter.js:54',err)
+//    }
 }else{
     program.help()
 }
