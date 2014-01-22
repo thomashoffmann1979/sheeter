@@ -1,16 +1,20 @@
 {
     "name": "sheeter",
-    "description": "Spreadsheet Module",
-    "homepage": "http://sheeter.tualo.de",
-    "main": "app.js",
-    "version": "0.0.12",
+    "description": "Spreadsheet Module/ Commandline Tool",
+    "homepage": "https://github.com/thomashoffmann1979/sheeter",
+    "main": "lib/main.js",
+    "bin": {
+        "sheeter": "./bin/sheeter"
+    },
+    "version": "0.0.1",
     "engines": {
         "node": ">=0.8.0"
     },
     "keywords": [
         "spreadsheet",
         "excel",
-        "calc"
+        "calc",
+        "commandline"
     ],
     "author": [
         {

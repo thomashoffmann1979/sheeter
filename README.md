@@ -4,13 +4,22 @@ Description
 Sheeter is a spreadsheet structure. It aims to be the backend for
 client and server side javascript spreadsheet programs.
 
-State
+Installation
+============
+
+Note: This is a really early state of code, so you can have a look inside. But please
+don't use it in any program, at this time!
+    
+    [sudo] npm install git+https://github.com/thomashoffmann1979/sheeter.git -g
+
+Usage
 =====
+    
+    sheeter show <myfile>
+    
+or
 
-* experimental
-
-	Note: This is a really early state of code, so you can have a look inside. But please
-	don't use it in any program, at this time!
+    sheeter show <myfile> <mytable>
 
 Requirements
 ============
