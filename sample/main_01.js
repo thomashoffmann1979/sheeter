@@ -8,4 +8,4 @@ sheeter = new Sheeter();
 sheeter.on('opened',function(wb){
     wb.output();
 });
-sheeter.open(path.join(__dirname,'sample_01.xlsx'));
+sheeter.open(path.join(__dirname,'sample_01.xlsx'),false);
