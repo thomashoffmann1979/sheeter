@@ -1,13 +1,14 @@
-var STATES={
-    NONE: 0,
-    OPENSTARTTAG: 1, // <
-    INSIDESTARTTAG: 2,
-    OPENENDTAG: 3, // >
-    INSIDEATTRIBUTE: 4,
-    INCDATA: 5
-},
-    util = require('util'),
-    EventEmitter = require('events').EventEmitter;
+var util = require('util'),
+    EventEmitter = require('events').EventEmitter,
+    STATES={
+        NONE:             0,
+        OPENSTARTTAG:     1,
+        INSIDESTARTTAG:   2,
+        OPENENDTAG:       3,
+        INSIDEATTRIBUTE:  4,
+        INCDATA:          5,
+        INCOMMENT:        6
+    };
 
 var XSAX = function(){
     return this;
@@ -41,7 +42,7 @@ XSAX.prototype.parse = function(data){
         stag,
         attributeName,
         item,
-        c = 0,
+        comment,
         me = this;
         
     while( current < length ){
@@ -84,6 +85,28 @@ XSAX.prototype.parse = function(data){
                 ){
                     temp.pop();
                     temp.pop();
+                    
+                    lastChars = shiftChars(lastChars,char);
+                    current+=1;
+                    
+                    state = STATES.NONE;
+                    continue;       
+                }
+                break;
+            case STATES.COMMENT:
+                if ( 
+                    (lastChars[7] == 45  ) && 
+                    (lastChars[8] == 45  ) && 
+                    (char == 62  ) 
+                ){
+                    temp.pop();
+                    //temp.pop();
+                    item = stack.pop();
+                    comment = (new Buffer(temp)).toString('utf8',1,temp.length-1);
+                    item.comment = (item.comment)?item.comment+' '+comment:comment ;
+                    stack.push(item);
+                    console.log(item);
+                    temp = [];
                     lastChars = shiftChars(lastChars,char);
                     current+=1;
                     
@@ -94,6 +117,14 @@ XSAX.prototype.parse = function(data){
             case STATES.OPENSTARTTAG:
                 
                 if ( 
+                    (lastChars[6] == 60  ) &&
+                    (lastChars[7] == 33  ) && 
+                    (lastChars[8] == 45  ) && 
+                    (char == 45  ) 
+                ){
+                    temp = [];
+                    state = STATES.COMMENT;
+                }else if ( 
                     (lastChars[1] == 60 ) &&
                     (lastChars[2] == 33 ) &&
                     (lastChars[3] == 91 ) &&
