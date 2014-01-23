@@ -23,11 +23,8 @@ var d = fs.readFileSync(path.join(__dirname,'..','tmp','xl','worksheets','sheet1
 end = (new Date()).getTime();
 console.log('done ',(end-start)/1000,'ms');
 
-sax.on('tag',function(path,tag){
-    //if (tag=='row'){
-        //console.log(tag);
-        
-    //}
+sax.on('tag',function(stack,tag){
+    //console.log(tag,stack);//[stack.length-1]);
 })
 sax.parse(d);
 

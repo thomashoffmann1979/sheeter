@@ -3,7 +3,8 @@ var STATES={
     OPENSTARTTAG: 1, // <
     INSIDESTARTTAG: 2,
     OPENENDTAG: 3, // >
-    INSIDEATTRIBUTE: 4
+    INSIDEATTRIBUTE: 4,
+    INCDATA: 5
 },
     util = require('util'),
     EventEmitter = require('events').EventEmitter;
@@ -15,12 +16,12 @@ var XSAX = function(){
 util.inherits(XSAX,EventEmitter);
 
 
-XSAX.prototype.shiftChars = function(lastChars,add){
-    var t,i,m;
+var shiftChars = function(lastChars,add){
+    var i,m;
     for(i=1,m=lastChars.length;i<m;i+=1){
         lastChars[i-1]=lastChars[i];
     } 
-    lastChars[lastChars.length-1] = t;
+    lastChars[lastChars.length-1] = add;
     return lastChars;
 }
 
@@ -31,7 +32,7 @@ XSAX.prototype.parse = function(data){
         state=STATES.NONE,
         char,
         //lastChar = -1,
-        lastChars = [-1,-1,-1,-1,-1,-1,-1,-1,-1], // <![CDATA[Inhalt]]>
+        lastChars = [-1,-1,-1,-1,-1,-1,-1,-1,-1], // for <![CDATA[ and ]]>
         tag=[],
         temp=[],
         attrBuffer,
@@ -43,19 +44,20 @@ XSAX.prototype.parse = function(data){
         
     while( current < length ){
         char = data.readUInt8(current);
+        
         switch (state){
             case STATES.NONE:
                 if (char == 60){
                     state = STATES.OPENSTARTTAG;
-                    lastChar = char;
+                    lastChars = shiftChars(lastChars,char);
                     char = data.readUInt8(current+1);
                     temp = [];
                     current+=1;
                 }
-                if (( lastChar == 60 ) && ( char == 47 )){
+                if (( lastChars[8] == 60 ) && ( char == 47 )){
                     // closing tag
                     state = STATES.OPENENDTAG;
-                    lastChar = char;
+                    lastChars = shiftChars(lastChars,char);
                     char = data.readUInt8(current+1);
                     temp = [];
                     current+=1;
@@ -63,17 +65,21 @@ XSAX.prototype.parse = function(data){
                 }
                 break;
             case STATES.OPENSTARTTAG:
-                if ( ( char == 62 ) && ( lastChar == 47 ) ){ 
+                if ( ( char == 62 ) && ( lastChars[8] == 47 ) ){ 
                     // self closed tag without attributes;
                     tag = temp;
                     tag.pop();       
                     
                     stag = (new Buffer(tag)).toString();
+                    stack.push({
+                        tag:stag
+                    });
                     me.emit('tag',stack,stag);
+                    stack.pop();
                     
                     temp = [];
                     state = STATES.NONE;
-                }else if ( ( char == 62 )  && ( lastChar == 63 ) ){ // ?>
+                }else if ( ( char == 62 )  && ( lastChars[8] == 63 ) ){ // ?>
                     temp = [];
                     // starting <?xml .. ?> ---> do nothing!
                     state = STATES.NONE;
@@ -103,25 +109,26 @@ XSAX.prototype.parse = function(data){
                      char=data.readUInt8(current);
                      temp=[];
                 }
-                if (( lastChar == 61 ) && ( char == 34 )){
+                if (( lastChars[8] == 61 ) && ( char == 34 )){
                     current += 1;
                     char = data.readUInt8(current);
                     attributeName = (new Buffer(temp)).toString('utf8', ( (temp[0]==32)?1:0 ) , temp.length - ( (temp[temp.length-1]==61)?1:0 )  ) ;
                     state = STATES.INSIDEATTRIBUTE;
                     temp=[];
-                }else if ( ( char == 62 )  && ( lastChar == 63 ) ){ 
+                }else if ( ( char == 62 )  && ( lastChars[8] == 63 ) ){ 
                     temp = [];
                     stack = [];
                     state = STATES.NONE;
                 }else if ( char == 62 ){ // >
                     temp = [];
                     state = STATES.NONE;
-                    if ( lastChar == 47 ){ // / <- self closed tag!
+                    if ( lastChars[8] == 47 ){ // / <- self closed tag!
                         stag = (new Buffer(tag)).toString();
                         if (stag == stack[stack.length-1].tag){
+                            me.emit('tag',stack,stag);
                             stack.pop();
                             // self closed tag with attributes
-                            me.emit('tag',stack,stag);
+                            
                         }else{
                             throw Error('invalid tag or syntax at postition '+current+' '+stag+' !== '+stack[stack.length-1]+' ');
                         }
@@ -149,18 +156,20 @@ XSAX.prototype.parse = function(data){
                     stag = (new Buffer(tag)).toString();
                     // closed tag
                     if (stag == stack[stack.length-1].tag){
+                        me.emit('tag',stack,stag);
                         stack.pop();
                     }else{
                         throw Error('invalid tag or syntax at postition '+current+' '+stag+' !== '+stack[stack.length-1]+' ');
                     }
-                    me.emit('tag',stack,stag);
-                    //console.log('close tag found: ',(new Buffer(tag)).toString());
+                    
+                    //console.log('close tag found: ',stag);
                     temp = [];
                     tag=[];
                 }
                 break;
         }
-        lastChar = char;
+        lastChars = shiftChars(lastChars,char);
+        //console.log(lastChars[8]);
         temp.push(char);
         current+=1;
     }
