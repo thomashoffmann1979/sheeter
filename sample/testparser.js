@@ -61,7 +61,7 @@ XSAX.prototype.parse = function(data){
                     state = STATES.NONE;
                 }else if ( ( char == 62 )  && ( lastChar == 63 ) ){ // ?>
                     temp = [];
-                    console.log('here');
+                    //console.log('here');
                     state = STATES.NONE;
                 }else if ( ( char == 62 )  ){ // >
                     tag = temp;  
@@ -91,7 +91,7 @@ XSAX.prototype.parse = function(data){
                         if (stag == stack[stack.length-1]){
                             stack.pop();
                         }else{
-                            throw Error('invalid tag or syntax at postition '+current);
+                            throw Error('invalid tag or syntax at postition '+current+' '+stag+' !== '+stack[stack.length-1]+' ');
                         }
                         me.emit('tag',stack,stag);
                         //console.log('close tag found*: ',(new Buffer(tag)).toString());
@@ -123,58 +123,5 @@ XSAX.prototype.parse = function(data){
         temp.push(char);
         current+=1;
     }
-    /*
-    while( current < length ){
-        switch (state){
-            case STATES.NONE:
-                
-                while( (char = data.readUInt8(current)) !== 60 ){ // <
-                    //console.log('start tag at',current);
-                    temp.push(char);
-                    current+=1;
-                }
-                lastInside = temp;
-                //console.log((new Buffer(temp)).toString()); 
-                // /=47
-                current+=1;
-                temp=[];
-                while( (char = data.readUInt8(current)) !== 62 ){ // >
-                    //console.log('start tag at',current);
-                    temp.push(char);
-                    current+=1;
-                }
-                
-                if ( (temp[0]==47) && (temp[1]==118) ){
-                    // value tag closed
-                    //console.log('cfound');
-                }
-                
-                if ( (temp[0]==47) && (temp[1]==116) ){
-                    // text tag closed
-                    //console.log((new Buffer(lastInside)).toString()); 
-                    //console.log('cfound');
-                }
-                
-                if ( (temp[0]==47) && (temp[1]==102) ){
-                    // formula tag closed
-                    //console.log('cfound');
-                }
-                
-                if ( (temp[0]==47) && (temp[1]==99) ){
-                    // cell tag closed
-                    //console.log('cfound');
-                }
-                //console.log((new Buffer(temp)).toString()); 
-                temp = [];
-                lastInside = [];
-                //process.exit();
-                
-                current+=1;
-            break;
-            default:
-                current+=1;
-        }
-    }
-    */
 }
 exports.XSAX = XSAX;
