@@ -6,27 +6,16 @@ var start = (new Date()).getTime();
 var SAX = require('./testparser').XSAX;
 var sax = new SAX();
 var end;
-/*
-var reader = new SheetReader();
-var d = fs.readFileSync(path.join(__dirname,'..','tmp','xl','worksheets','sheet1.xml'));
-reader.data = d.toString();
-reader.on('debug',function(t){
-    console.log(t);
-})
-reader.on('ready',function(){
-    var end = (new Date()).getTime();
-    console.log('done ',(end-start)/1000,'ms');
-});
-reader.parse();
-*/
+
 var d = fs.readFileSync(path.join(__dirname,'..','tmp','xl','worksheets','sheet1.xml'));
 end = (new Date()).getTime();
 console.log('done ',(end-start)/1000,'ms');
 
 sax.on('tag',function(stack,tag){
-    //if (tag=='t'){
-        //console.log(tag,stack);//[stack.length-1]);
-    //}
+    if (tag=='t'){
+       //console.log(tag,stack);
+       //console.log(stack[stack.length-1].value);
+    }
 })
 sax.parse(d);
 

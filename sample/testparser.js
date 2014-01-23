@@ -41,13 +41,15 @@ XSAX.prototype.parse = function(data){
         stag,
         attributeName,
         item,
+        c = 0,
         me = this;
         
     while( current < length ){
         char = data.readUInt8(current);
-        
+        //if ( current > 1000 ){ return; } 
         switch (state){
             case STATES.NONE:
+                
                 if ((char == 60) && (data.readUInt8(current+1)!=47)){
                     
                     state = STATES.OPENSTARTTAG;
@@ -55,14 +57,17 @@ XSAX.prototype.parse = function(data){
                     char = data.readUInt8(current+1);
                     temp = [];
                     current+=1;
-                }
-                if (( lastChars[8] == 60 ) && ( char == 47 )){
+                }else if (( lastChars[8] == 60 ) && ( char == 47 )){
                     // closing tag
                     if (stack.length>0){
                         //slowdown 30%
-                        item = stack.pop();
-                        item.value = (new Buffer(temp)).toString('utf8',1,temp.length-1);
-                        stack.push(item);
+                        if (temp.length>1){
+                            item = stack.pop();
+                            item.value = (new Buffer(temp)).toString('utf8',1,temp.length-1);
+                            stack.push(item);
+                        }else{
+                            console.log("error",temp);
+                        }
                     }
                     state = STATES.OPENENDTAG;
                     lastChars = shiftChars(lastChars,char);
@@ -71,8 +76,37 @@ XSAX.prototype.parse = function(data){
                     temp = [];
                 }
                 break;
+            case STATES.INCDATA:
+                if ( 
+                    (lastChars[7] == 93  ) && 
+                    (lastChars[8] == 93  ) && 
+                    (char == 62  ) 
+                ){
+                    temp.pop();
+                    temp.pop();
+                    lastChars = shiftChars(lastChars,char);
+                    current+=1;
+                    
+                    state = STATES.NONE;
+                    continue;       
+                }
+                break;
             case STATES.OPENSTARTTAG:
-                if ( ( char == 62 ) && ( lastChars[8] == 47 ) ){ 
+                
+                if ( 
+                    (lastChars[1] == 60 ) &&
+                    (lastChars[2] == 33 ) &&
+                    (lastChars[3] == 91 ) &&
+                    (lastChars[4] == 67  ) &&
+                    (lastChars[5] == 68  ) &&
+                    (lastChars[6] == 65  ) &&
+                    (lastChars[7] == 84  ) && 
+                    (lastChars[8] == 65  ) && 
+                    (char == 91  ) 
+                ){
+                    temp = [];
+                    state = STATES.INCDATA;
+                }else if ( ( char == 62 ) && ( lastChars[8] == 47 ) ){ 
                     // self closed tag without attributes;
                     tag = temp;
                     tag.pop();       
@@ -166,7 +200,7 @@ XSAX.prototype.parse = function(data){
                         me.emit('tag',stack,stag);
                         stack.pop();
                     }else{
-                        throw Error('invalid tag or syntax at postition '+current+' '+stag+' !== '+stack[stack.length-1]+' ');
+                        throw Error('invalid tag or syntax at postition '+current+' '+stag+' !== '+stack[stack.length-1].tag+' ');
                     }
                     
                     //console.log('close tag found: ',stag);
