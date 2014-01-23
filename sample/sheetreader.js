@@ -24,10 +24,10 @@ end = (new Date()).getTime();
 console.log('done ',(end-start)/1000,'ms');
 
 sax.on('tag',function(path,tag){
-    if (tag=='row'){
-        console.log(path.join('/'),tag);
+    //if (tag=='row'){
+        //console.log(tag);
         
-    }
+    //}
 })
 sax.parse(d);
 
