@@ -24,7 +24,9 @@ end = (new Date()).getTime();
 console.log('done ',(end-start)/1000,'ms');
 
 sax.on('tag',function(stack,tag){
-    //console.log(tag,stack);//[stack.length-1]);
+    //if (tag=='t'){
+        //console.log(tag,stack);//[stack.length-1]);
+    //}
 })
 sax.parse(d);
 

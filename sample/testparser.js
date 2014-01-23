@@ -17,6 +17,7 @@ util.inherits(XSAX,EventEmitter);
 
 
 var shiftChars = function(lastChars,add){
+    //slowdown 30%
     var i,m;
     for(i=1,m=lastChars.length;i<m;i+=1){
         lastChars[i-1]=lastChars[i];
@@ -47,7 +48,8 @@ XSAX.prototype.parse = function(data){
         
         switch (state){
             case STATES.NONE:
-                if (char == 60){
+                if ((char == 60) && (data.readUInt8(current+1)!=47)){
+                    
                     state = STATES.OPENSTARTTAG;
                     lastChars = shiftChars(lastChars,char);
                     char = data.readUInt8(current+1);
@@ -56,10 +58,15 @@ XSAX.prototype.parse = function(data){
                 }
                 if (( lastChars[8] == 60 ) && ( char == 47 )){
                     // closing tag
+                    if (stack.length>0){
+                        //slowdown 30%
+                        item = stack.pop();
+                        item.value = (new Buffer(temp)).toString('utf8',1,temp.length-1);
+                        stack.push(item);
+                    }
                     state = STATES.OPENENDTAG;
                     lastChars = shiftChars(lastChars,char);
                     char = data.readUInt8(current+1);
-                    temp = [];
                     current+=1;
                     temp = [];
                 }
