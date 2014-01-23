@@ -105,7 +105,7 @@ XSAX.prototype.parse = function(data){
                     comment = (new Buffer(temp)).toString('utf8',1,temp.length-1);
                     item.comment = (item.comment)?item.comment+' '+comment:comment ;
                     stack.push(item);
-                    console.log(item);
+                    //console.log(item);
                     temp = [];
                     lastChars = shiftChars(lastChars,char);
                     current+=1;
