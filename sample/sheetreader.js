@@ -10,7 +10,7 @@ var end;
 
 var d = fs.readFileSync(path.join(__dirname,'..','tmp','xl','worksheets','sheet1.xml'));
 end = (new Date()).getTime();
-console.log('done ',(end-start)/1000,'ms');
+console.log('done ',(end-start)/1000,'s');
 start = (new Date()).getTime();
 xsax.on('tag',function(stack,tag){
     //if (tag=='t'){
