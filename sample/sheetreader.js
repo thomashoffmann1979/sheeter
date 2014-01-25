@@ -22,10 +22,10 @@ xsax.parse(d);
 
 
 end = (new Date()).getTime();
-console.log('done ',(end-start)/1000,'ms');
+console.log('done ',(end-start)/1000,'s');
 
 start = (new Date()).getTime();
 parser = sax.parser(true);
 parser.write(d.toString()).close();
 end = (new Date()).getTime();
-console.log('done ',(end-start)/1000,'ms');
+console.log('done ',(end-start)/1000,'s');

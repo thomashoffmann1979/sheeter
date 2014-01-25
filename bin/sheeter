@@ -53,7 +53,7 @@ if ( (program.args.length >0 ) && (program.args.length < 3) ){
             });
             
             if (program.time){
-                console.log( ((new Date()).getTime()-startTime)/1000+"ms");
+                console.log( ((new Date()).getTime()-startTime)/1000+"s");
             }
         });
         sheeter.open(program.args[0],(typeof program.inactive=='undefined'));
