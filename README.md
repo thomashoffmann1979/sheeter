@@ -12,6 +12,12 @@ don't use it in any program, at this time!
     
     [sudo] npm install git+https://github.com/thomashoffmann1979/sheeter.git -g
 
+ToDo
+====
+
+* adding support for open document spreadsheet (*.ods)
+
+
 Usage
 =====
 
