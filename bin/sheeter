@@ -3,13 +3,20 @@
 var fs = require('fs'),
     program = require('commander'),
     pjson = require('../package.json'),
-    XLSXReader = require('../lib/reader/xlsxreader').XLSXReader,
+    sheeter_utils= require('../lib/utils/utils'),
+    //XLSXReader = require('../lib/reader/xlsxreader').XLSXReader,
     path =  require('path'),
     sheeter,
     filename,
     sheetname,
     startTime,
-    Sheeter = require('../lib/main').Sheeter;
+    readline = require('readline'),
+    Sheeter = require('../lib/main').Sheeter,
+    rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+    });
+
 
 var exdendedHelp = function(){
     var examples = [];
@@ -35,9 +42,97 @@ program
     .usage('[options] <file> [sheet]')
     .option('-i, --inactive', 'Don\'t calculate any formulas')
     .option('-f, --full', 'Display the full column width.')
+    .option('-e, --edit', 'enable Edit-Mode')
     .option('-t, --time', 'Display the elapsed time.')
     .on('--help', exdendedHelp)
     .parse(process.argv);
+
+
+var interActive = function(opt){
+    
+    if ( (typeof opt.show != 'undefined') && ( opt.show === true) ){
+        opt.wb.output({
+            sheet: opt.sheetName,
+            full: opt.displayFull
+        });
+    }
+    
+    if ( (typeof opt.help != 'undefined') && ( opt.help === true) ){
+        var help = [
+            ['exit','exits the program'],
+            ['show','show the current sheet'],
+            ['use <sheet>','change the current sheet']
+        ];
+        for( var i in help ){
+            console.log('   ',sheeter_utils.alignString(help[i][0],'l',20),sheeter_utils.alignString(help[i][1],'l',40));
+        }
+    }
+    
+    rl.question(">", function(answer) {
+        
+        var keyword = "",
+            argument = "",
+            pos=0,
+            state = -1,
+            c;
+        while (pos<answer.length){
+            c = answer.charAt(pos);
+            switch(c){
+                case ' ':
+                    if (state == -1){
+
+                    }else if (state == 0){
+                        state = 1;
+                    }else if (state == 1){
+                        argument+=c;
+                    }
+                    break;
+                case '"':
+                    if (state == 1){
+
+                    }
+                    break;
+                default:
+                    if (state == 1){
+                        argument+=c;
+                    }else if (state == 0){
+                        keyword+=c;
+                    }else if (state == -1){
+                        state = 0;
+                        keyword+=c;
+                    }
+                    break;
+            }
+            pos+=1;
+        }
+        
+        switch (keyword){
+            case "help":
+                interActive({ wb:opt.wb,help:true,sheetName: opt.sheetName,displayFull: opt.displayFull});
+                break;
+            case "show":
+                interActive({ wb:opt.wb,show:true,sheetName: opt.sheetName,displayFull: opt.displayFull});
+                break;
+            case "use":
+                if (typeof argument !== 'undefined'){
+                    try{
+                        var sh = wb.getWorkSheet(argument);
+                        interActive({ wb:opt.wb,show:true,sheetName: sh.title,displayFull: opt.displayFull});
+                    }catch(e){
+                        console.log('The sheet',argument,'was not found.');
+                        interActive({ wb:opt.wb,sheetName: opt.sheetName,displayFull: opt.displayFull});
+                    }
+                }
+                break;
+            case "exit":
+                process.exit();
+                break;
+            default:
+                interActive(opt);
+        }
+    });
+}
+
 
 if ( (program.args.length >0 ) && (program.args.length < 3) ){
     
@@ -55,6 +150,14 @@ if ( (program.args.length >0 ) && (program.args.length < 3) ){
             if (program.time){
                 console.log( ((new Date()).getTime()-startTime)/1000+"s");
             }
+            
+            if (program.edit){
+                interActive({
+                    wb: wb,
+                    sheetName: program.args[1],
+                    displayFull: program.full
+                });
+            }
         });
         sheeter.open(program.args[0],(typeof program.inactive=='undefined'));
 //    }catch(err){
@@ -63,3 +166,4 @@ if ( (program.args.length >0 ) && (program.args.length < 3) ){
 }else{
     program.help()
 }
+
