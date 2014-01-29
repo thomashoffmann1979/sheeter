@@ -62,10 +62,12 @@ var interActive = function(opt){
             ['exit','exits the program'],
             ['show','show the current sheet'],
             ['list','list all sheets'],
-            ['use <sheet>','change the current sheet']
+            ['use <sheet>','change the current sheet'],
+            ['<id> = <value>','set the value for the cell (ie. a1=123)'],
+            ['<id> := <formula>','set the formula for the cell (ie. a2=b1+b3)']
         ];
         for( var i in help ){
-            console.log('   ',sheeter_utils.alignString(help[i][0],'l',20),sheeter_utils.alignString(help[i][1],'l',40));
+            console.log('   ',sheeter_utils.alignString(help[i][0],'l',20),sheeter_utils.alignString(help[i][1],'l',50));
         }
     }
     
