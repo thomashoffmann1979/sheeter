@@ -13,10 +13,10 @@ sheet.getCell('A5',{value: 5});
 sheet.getCell('A6',{formula:'=SUM(A1:A5)'});
 console.log(sheet.getCell('A6').value);
 
-sheet.getCell('A7',{formula:'=AVG(A1:A5)'});
+sheet.getCell('A7',{formula:'=AVERAGE(A1:A5)'});
 console.log(sheet.getCell('A7').value);
 
-sheet.getCell('A7').formula ='=AVG(A1;A4;A5)';
+sheet.getCell('A7').formula ='=AVERAGE(A1;A4;A5)';
 console.log(sheet.getCell('A7').value);
 
 
