@@ -19,8 +19,11 @@ sheet.getCell('A8').formula ='=Max(A1;A2)';
 sheet.getCell('A9').formula ='=Min(A1:A2)';
 sheet.getCell('B1').value ='My Sample Text';
 
+sheet = workbook.createWorkSheet();
+sheet.getCell('A1',{value: 99});
+
 writer = new XLSXWriter({
-    filename: path.join(path.sep,'tmp','test.xlsx'),
+    filename: path.join(path.sep,'tmp','test4.xlsx'),
     workbook: workbook
 });
 
