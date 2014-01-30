@@ -13,10 +13,11 @@ sheet.getCell('A3',{value: 5});
 sheet.getCell('A4',{value: 5});
 sheet.getCell('A5',{value: 5});
 sheet.getCell('A6',{formula:'=SUM(A1:A5)'});
-sheet.getCell('A7',{formula:'=AVG(A1:A5)'});
-sheet.getCell('A7').formula ='=AVG(A1;A4;A5)';
+sheet.getCell('A7',{formula:'=AVERAGE(A1:A5)'});
+sheet.getCell('A7').formula ='=AVERAGE(A1;A4;A5)';
 sheet.getCell('A8').formula ='=Max(A1;A2)';
 sheet.getCell('A9').formula ='=Min(A1:A2)';
+sheet.getCell('B1').value ='My Sample Text';
 
 writer = new XLSXWriter({
     filename: path.join(path.sep,'tmp','test.xlsx'),
