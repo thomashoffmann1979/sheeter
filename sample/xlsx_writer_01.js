@@ -4,9 +4,11 @@ var XLSXReader = require('../lib/reader/xlsxreader').XLSXReader,
     writer,
     Workbook = require('../lib/workbook/workbook').Workbook,
     workbook = new Workbook(),
-    sheet = workbook.createWorkSheet();
-
-sheet.getCell('A1',{value: 5});
+    sheet = workbook.createWorkSheet(),
+    Zip = require('adm-zip');
+sheet.title = 'Blatt1';
+sheet.getCell('A1',{value: 1});
+sheet.getCell('B1',{value: 2});
 /*
 sheet.getCell('A1').value=1;
 sheet.getCell('A2',{value: 5});
@@ -31,14 +33,17 @@ writer = new XLSXWriter({
 
 writer.save();
 
-
+var zip = new Zip(path.join(path.sep,'tmp','test4.xlsx'));
+zip.extractAllTo('/tmp/test4',true);
+    
+/*
 reader = new XLSXReader({
     filename: writer.filename,
     workbook: new Workbook()
 });
 
 reader.on('sheetsReady', function(){
-    var list = reader.workbook.getWorkSheetList(),
+    var list = reader.workbook.getSheetList(),
         i,
         m,
         r;
@@ -60,3 +65,4 @@ reader.open({},function(err){
     if (err) throw err;
     //console.log('done');
 });
+*/
