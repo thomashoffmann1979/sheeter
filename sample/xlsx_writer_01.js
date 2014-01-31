@@ -1,10 +1,10 @@
-var XLSXWriter = require('../lib/writer/xlsxwriter').XLSXWriter,
+var XLSXReader = require('../lib/reader/xlsxreader').XLSXReader,
+    XLSXWriter = require('../lib/writer/xlsxwriter').XLSXWriter,
     path =  require('path'),
     writer,
-    Workbook = require('../lib/workbook/workbook').Workbook;
-
-var workbook = new Workbook();
-var sheet = workbook.createWorkSheet();
+    Workbook = require('../lib/workbook/workbook').Workbook,
+    workbook = new Workbook(),
+    sheet = workbook.createWorkSheet();
 
 sheet.getCell('A1',{value: 5});
 /*
@@ -30,3 +30,33 @@ writer = new XLSXWriter({
 });
 
 writer.save();
+
+
+reader = new XLSXReader({
+    filename: writer.filename,
+    workbook: new Workbook()
+});
+
+reader.on('sheetsReady', function(){
+    var list = reader.workbook.getWorkSheetList(),
+        i,
+        m,
+        r;
+    
+    for(i in list){
+        m = list[i].getMatrixByRow({nice:true,header:true,rows:true});
+        console.log(list[i].title+':');
+        for( r in m ){
+            console.log('|'+m[r].join('|')+'|');
+            if ( i == 0){
+                
+            }
+        }
+    }
+
+});
+
+reader.open({},function(err){
+    if (err) throw err;
+    //console.log('done');
+});
