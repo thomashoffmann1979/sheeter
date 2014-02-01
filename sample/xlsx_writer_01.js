@@ -27,15 +27,16 @@ sheet = workbook.createWorkSheet();
 sheet.getCell('A1',{value: 99});
 */
 writer = new XLSXWriter({
-    filename: path.join(path.sep,'tmp','test4.xlsx'),
+    filename: path.join(path.sep,'tmp','test.xlsx'),
     workbook: workbook
 });
 
 writer.save();
 
+/*
 var zip = new Zip(path.join(path.sep,'tmp','test4.xlsx'));
 zip.extractAllTo('/tmp/test4',true);
-    
+  */  
 /*
 reader = new XLSXReader({
     filename: writer.filename,
