@@ -9,6 +9,7 @@ var XLSXReader = require('../lib/reader/xlsxreader').XLSXReader,
 sheet.title = 'Blatt1';
 sheet.getCell('A1',{value: 1});
 sheet.getCell('B1',{value: 2});
+sheet.getCell('B3',{value: 5});
 /*
 sheet.getCell('A1').value=1;
 sheet.getCell('A2',{value: 5});
