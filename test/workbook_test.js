@@ -60,7 +60,7 @@ var max_queries = [
 
 var text_queries = [
     {
-        test: '=LEFT(C1;2)',
+        test: '=LEFT(C1 & C2;2)',
         result: 'Te'
     },
     {
