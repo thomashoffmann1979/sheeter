@@ -51,7 +51,13 @@ program
 
 
 var interActive = function(opt){
-    
+    if (typeof opt.sheetName == 'undefined'){
+        var list = opt.wb.getSheetList();
+        if (list.length == 1){
+            opt.sheetName = list[0].title;
+        }
+    }
+        
     if ( (typeof opt.show != 'undefined') && ( opt.show === true) ){
         opt.wb.output({
             sheet: opt.sheetName,
@@ -181,14 +187,15 @@ var interActive = function(opt){
                 process.exit();
                 break;
             default:
-                console.log(argument);
+
                 pos = argument.indexOf('=');
                 operand =  argument.substring(0,pos+1).replace(/^\s/,'').replace(/\s$/,'');
                 term =  argument.substring(pos+1).replace(/^\s/,'').replace(/\s$/,'');
                 if (typeof opt.sheetName!='undefined'){
                     try{
-                        console.log(operand);
+
                         if(sheeter_utils.isCellNotation(keyword)){
+                            opt.show=true;
                             if(operand == ':='){
                                 sh = opt.wb.getWorkSheet(opt.sheetName);
                                 cell = sh.getCell(keyword);
@@ -213,7 +220,7 @@ if ( (program.args.length >0 ) && (program.args.length < 3) ){
     
     startTime = (new Date()).getTime();
     
-//    try{
+    try{
         sheeter = new Sheeter();
         sheeter.on('opened',function(wb){
             var list = wb.getSheetList();
@@ -232,12 +239,14 @@ if ( (program.args.length >0 ) && (program.args.length < 3) ){
                     sheetName: program.args[1],
                     displayFull: program.full
                 });
+            }else{
+                process.exit();
             }
         });
         sheeter.open(program.args[0],(typeof program.inactive=='undefined'));
-//    }catch(err){
-//        console.log('sheeter.js:54',err)
-//    }
+    }catch(err){
+        console.log('sheeter.js:54',err)
+    }
 }else{
     program.help()
 }
