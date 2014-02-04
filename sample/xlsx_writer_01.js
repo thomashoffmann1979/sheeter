@@ -8,6 +8,10 @@ var XLSXReader = require('../lib/reader/xlsxreader').XLSXReader,
     Zip = require('adm-zip');
 sheet.title = 'Blatt1';
 sheet.getCell('A1',{value: 1});
+sheet.getCell('A4',{value: "Hello"});
+sheet.getCell('A5',{value: "&Äüö@"});
+sheet.getCell('A6',{value: "\""});
+sheet.getCell('A7',{value: "\'"});
 sheet.getCell('B1',{value: 2});
 sheet.getCell('B3',{value: 5});
 /*
