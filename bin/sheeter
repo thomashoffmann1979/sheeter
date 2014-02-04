@@ -4,6 +4,7 @@ var fs = require('fs'),
     program = require('commander'),
     pjson = require('../package.json'),
     sheeter_utils= require('../lib/utils/utils'),
+    XLSXWriter = require('../lib/writer/xlsxwriter').XLSXWriter,
     //XLSXReader = require('../lib/reader/xlsxreader').XLSXReader,
     path =  require('path'),
     sheeter,
@@ -36,6 +37,7 @@ var exdendedHelp = function(){
     examples.push( '');
     console.log(examples.join("\n"));
 }
+
 program
     .version(pjson.version)
     .description('Spreadsheet in your console')
@@ -62,9 +64,10 @@ var interActive = function(opt){
             ['exit','exits the program'],
             ['show','show the current sheet'],
             ['list','list all sheets'],
+            ['save <filename>','save the workbook'],
             ['use <sheet>','change the current sheet'],
             ['<id> = <value>','set the value for the cell (ie. a1=123)'],
-            ['<id> := <formula>','set the formula for the cell (ie. a2=b1+b3)']
+            ['<id> := <formula>','set the formula for the cell (ie. a2:=b1+b3)']
         ];
         for( var i in help ){
             console.log('   ',sheeter_utils.alignString(help[i][0],'l',20),sheeter_utils.alignString(help[i][1],'l',50));
@@ -135,6 +138,27 @@ var interActive = function(opt){
             case "show":
                 interActive({ wb:opt.wb,show:true,sheetName: opt.sheetName,displayFull: opt.displayFull});
                 break;
+                
+            case "save":
+
+                if (typeof argument !== 'undefined'){
+                    try{
+                        var writer = new XLSXWriter({
+                            filename: argument,
+                            workbook: opt.wb
+                        });
+                        writer.save();
+                    }catch(e){
+                        console.log(e);
+                    }
+                }else{
+                    console.log('Invalid filename.');
+                }
+
+                
+                interActive({ wb:opt.wb,show:false,sheetName: opt.sheetName,displayFull: opt.displayFull});
+                break;
+                
             case "list":
                 var list = opt.wb.getSheetList();
                 for(var i in list){
