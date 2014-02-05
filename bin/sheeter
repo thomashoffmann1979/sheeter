@@ -155,7 +155,7 @@ var interActive = function(opt){
                         });
                         writer.save();
                     }catch(e){
-                        console.log(e);
+                        console.log(e,e.stack);
                     }
                 }else{
                     console.log('Invalid filename.');
