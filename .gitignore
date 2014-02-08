@@ -6,4 +6,8 @@ p.js
 routes/to_ignore.js
 /public/codemirror.old
 /qtapp
-/tmp
+/tmptest.xlsx
+tmp
+tmp/test.xlsx
+
+/test.xlsx
