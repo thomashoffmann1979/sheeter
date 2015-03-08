@@ -10,4 +10,8 @@ routes/to_ignore.js
 tmp
 tmp/test.xlsx
 
-/test.xlsx
+/test.xlsxtest.numbers
+test2.xlsx
+test.xlsx
+test.numbers
+~$

@@ -13,6 +13,7 @@ var fs = require('fs'),
     startTime,
     readline = require('readline'),
     Sheeter = require('../lib/main').Sheeter,
+    Worksheet = require('../lib/worksheet/Worksheet').Worksheet,
     rl = readline.createInterface({
         input: process.stdin,
         output: process.stdout
@@ -57,14 +58,14 @@ var interActive = function(opt){
             opt.sheetName = list[0].title;
         }
     }
-        
+
     if ( (typeof opt.show != 'undefined') && ( opt.show === true) ){
         opt.wb.output({
             sheet: opt.sheetName,
             full: opt.displayFull
         });
     }
-    
+
     if ( (typeof opt.help != 'undefined') && ( opt.help === true) ){
         var help = [
             ['exit','exits the program'],
@@ -72,6 +73,7 @@ var interActive = function(opt){
             ['list','list all sheets'],
             ['save <filename>','save the workbook'],
             ['use <sheet>','change the current sheet'],
+            ['add <sheet>','add a new sheet, or open it if it exists'],
             ['<id> = <value>','set the value for the cell (ie. a1=123)'],
             ['<id> := <formula>','set the formula for the cell (ie. a2:=b1+b3)']
         ];
@@ -79,9 +81,9 @@ var interActive = function(opt){
             console.log('   ',sheeter_utils.alignString(help[i][0],'l',20),sheeter_utils.alignString(help[i][1],'l',50));
         }
     }
-    
+
     rl.question(((typeof opt.sheetName == 'undefined')?'':opt.sheetName)+">", function(answer) {
-        
+
         var keyword = "",
             argument = "",
             pos=0,
@@ -136,7 +138,7 @@ var interActive = function(opt){
             }
             pos+=1;
         }
-        
+
         switch (keyword){
             case "help":
                 interActive({ wb:opt.wb,help:true,sheetName: opt.sheetName,displayFull: opt.displayFull});
@@ -144,7 +146,7 @@ var interActive = function(opt){
             case "show":
                 interActive({ wb:opt.wb,show:true,sheetName: opt.sheetName,displayFull: opt.displayFull});
                 break;
-                
+
             case "save":
 
                 if (typeof argument !== 'undefined'){
@@ -161,10 +163,10 @@ var interActive = function(opt){
                     console.log('Invalid filename.');
                 }
 
-                
+
                 interActive({ wb:opt.wb,show:false,sheetName: opt.sheetName,displayFull: opt.displayFull});
                 break;
-                
+
             case "list":
                 var list = opt.wb.getSheetList();
                 for(var i in list){
@@ -180,6 +182,20 @@ var interActive = function(opt){
                     }catch(e){
                         console.log('The sheet',argument,'was not found.');
                         interActive({ wb:opt.wb,sheetName: opt.sheetName,displayFull: opt.displayFull});
+                    }
+                }
+                break;
+            case "add":
+                if (typeof argument !== 'undefined'){
+                    try{
+                        sh = opt.wb.getWorkSheet(argument);
+                        interActive({ wb:opt.wb,show:true,sheetName: sh.title,displayFull: opt.displayFull});
+                    }catch(e){
+                        opt.wb.addWorkSheet(new Worksheet({
+                          title: argument
+                        }));
+                        console.log('The sheet',argument,'was added.');
+                        interActive({ wb:opt.wb,show:true,sheetName: argument,displayFull: opt.displayFull});
                     }
                 }
                 break;
@@ -217,9 +233,9 @@ var interActive = function(opt){
 
 
 if ( (program.args.length >0 ) && (program.args.length < 3) ){
-    
+
     startTime = (new Date()).getTime();
-    
+
     try{
         sheeter = new Sheeter();
         sheeter.on('opened',function(wb){
@@ -228,11 +244,11 @@ if ( (program.args.length >0 ) && (program.args.length < 3) ){
                 sheet: program.args[1],
                 full: program.full
             });
-            
+
             if (program.time){
                 console.log( ((new Date()).getTime()-startTime)/1000+"s");
             }
-            
+
             if (program.edit){
                 interActive({
                     wb: wb,
@@ -250,4 +266,3 @@ if ( (program.args.length >0 ) && (program.args.length < 3) ){
 }else{
     program.help()
 }
-
