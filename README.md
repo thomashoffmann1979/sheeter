@@ -9,7 +9,7 @@ Installation
 
 Note: This is a really early state of code, so you can have a look inside. But please
 don't use it in any program, at this time!
-    
+
     [sudo] npm install sheeter -g
 
 or
@@ -20,15 +20,16 @@ ToDo
 ====
 
 * adding support for open document spreadsheet (*.ods)
+* adding support for numbers spreadsheet (*.numbers)
 
 
 Usage
 =====
 
 Displaying the content or list the sheets inside (if more than one sheet is inside).
-    
+
     sheeter <myfile>
-    
+
 Displaying the content of <mysheet>.
 
     sheeter <myfile> <mysheet>

@@ -149,21 +149,12 @@ var interActive = function(opt){
 
             case "save":
 
-                if (typeof argument !== 'undefined'){
-                    try{
-                        var writer = new XLSXWriter({
-                            filename: argument,
-                            workbook: opt.wb
-                        });
-                        writer.save();
-                    }catch(e){
-                        console.log(e,e.stack);
-                    }
-                }else{
-                    console.log('Invalid filename.');
+                try{
+                  sheeter.save(opt.wb,argument)
+                }catch(e){
+                    console.log(e,e.stack);
                 }
-
-
+                
                 interActive({ wb:opt.wb,show:false,sheetName: opt.sheetName,displayFull: opt.displayFull});
                 break;
 
